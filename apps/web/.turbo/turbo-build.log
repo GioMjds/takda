@@ -1,0 +1,30 @@
+
+> @takda/web@0.0.1 build C:\Users\giomj\OneDrive\Desktop\takda\apps\web
+> next build
+
+▲ Next.js 16.2.10 (Turbopack)
+- Environments: .env
+
+  Creating an optimized production build ...
+Turbopack build encountered 1 warnings:
+./apps/web
+Failed to find font override values for font `Google Sans`
+Skipping generating a fallback font.
+
+
+✓ Compiled successfully in 10.9s
+  Running TypeScript ...
+  Finished TypeScript in 6.1s ...
+  Collecting page data using 3 workers ...
+  Generating static pages using 3 workers (0/3) ...
+✓ Generating static pages using 3 workers (3/3) in 251ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /_not-found
+└ ƒ /[lang]
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

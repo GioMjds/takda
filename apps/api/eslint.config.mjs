@@ -5,7 +5,13 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {
-    ignores: ['eslint.config.mjs'],
+    ignores: [
+      'eslint.config.mjs',
+      'dist/**/*',
+      'src/generated/**/*',
+      '**/*.d.ts',
+      'test/**/*',
+    ],
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
@@ -35,7 +41,7 @@ export default tseslint.config(
       '@typescript-eslint/require-await': 'off',
       '@typescript-eslint/no-misused-promises': 'off',
       // "prettier/prettier": ["warn", { endOfLine: "auto" }],
-      'indent': 'off',
+      indent: 'off',
       '@typescript-eslint/indent': 'off',
     },
   },
