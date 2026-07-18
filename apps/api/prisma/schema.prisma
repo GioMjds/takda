@@ -1,0 +1,429 @@
+// =============================================================================
+// Takda — Prisma schema
+// -----------------------------------------------------------------------------
+// Source of truth for the storage layer. The Zod schemas in @takda/shared are
+// the *wire* contract; this file is the *storage* contract. Keep them in
+// sync — do not let one drift silently from the other.
+//
+// Conventions:
+//   • All `id` columns are CUIDs (string) — sortable, URL-safe, no PII.
+//   • All time columns are `timestamptz` in Postgres / `DateTime` in Prisma.
+//     Always store UTC; the web renders to Asia/Manila.
+//   • Soft-delete is intentionally absent. Bookings have a terminal `status`
+//     (cancelled / no_show) instead of being deleted.
+//   • Enums live at the bottom of this file.
+//   • Indexes are added where a hot path is known:
+//       - tenantId on every tenant-scoped table
+//       - businessId + slotStart on Booking (queue + lookup)
+//       - (serviceId, slotStart) UNIQUE on BookingSlot (concurrency)
+//       - phone on Booking (owner-side customer lookup)
+// =============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// -----------------------------------------------------------------------------
+// Tenancy
+// -----------------------------------------------------------------------------
+
+/// One deployment of Takda. For v1 this is a 1:1 with the running app; later
+/// it becomes the "organization" boundary for SaaS multi-tenancy.
+model Tenant {
+  id        String   @id @default(cuid())
+  slug      String   @unique // e.g. "acme" → acme.takda.app
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users       User[]
+  businesses  Business[]
+  idempotency IdempotencyKey[]
+  auditLogs   AuditLog[]
+}
+
+// -----------------------------------------------------------------------------
+// Identity
+// -----------------------------------------------------------------------------
+
+/// An owner / staff user. Belongs to one tenant, can own/operate many
+/// businesses. Auth is JWT; passwords are bcrypt-hashed here.
+model User {
+  id           String   @id @default(cuid())
+  tenantId     String
+  email        String
+  passwordHash String
+  name         String
+  role         UserRole @default(OWNER)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tenant        Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  memberships   Membership[]
+  refreshTokens RefreshToken[]
+
+  @@unique([tenantId, email])
+  @@index([tenantId])
+}
+
+/// Join table: which users work at which business and in what role.
+model Membership {
+  id         String         @id @default(cuid())
+  userId     String
+  businessId String
+  role       MembershipRole @default(STAFF)
+  createdAt  DateTime       @default(now())
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, businessId])
+  @@index([businessId])
+}
+
+/// Hashed refresh tokens for JWT rotation. The JWT itself is stateless;
+/// the refresh token is the durable credential.
+model RefreshToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+// -----------------------------------------------------------------------------
+// Business
+// -----------------------------------------------------------------------------
+
+/// A single walk-in business inside a tenant. The QR code points here.
+/// The owner configures services, hours, and capacity on this entity.
+model Business {
+  id        String   @id @default(cuid())
+  tenantId  String
+  slug      String // unique per tenant; used in URLs
+  name      String
+  timezone  String   @default("Asia/Manila")
+  // Address & contact
+  address   String?
+  phone     String?
+  // Status
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant      Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  services    Service[]
+  bookings    Booking[]
+  memberships Membership[]
+  reminders   Reminder[]
+  messages    Message[]
+  overrides   DayOverride[]
+
+  @@unique([tenantId, slug])
+  @@index([tenantId])
+}
+
+/// Per-business hours & day-level metadata (e.g. "closed on holidays").
+/// Kept tiny here; most hour-of-operation info lives on the Service
+/// because services can have different hours (e.g. lunch-only service).
+model DayOverride {
+  id               String   @id @default(cuid())
+  businessId       String
+  /// Calendar date in the business's timezone, midnight UTC equivalent.
+  /// e.g. 2026-07-18 — a `date` not a `timestamp`.
+  date             DateTime @db.Date
+  isClosed         Boolean  @default(false)
+  /// Optional override of opening / closing times in HH:mm (business TZ).
+  openTime         String?
+  closeTime        String?
+  /// Max total bookings for the day, across all services. NULL = no cap.
+  capacityOverride Int?
+  note             String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([businessId, date])
+  @@index([businessId, date])
+}
+
+// -----------------------------------------------------------------------------
+// Service
+// -----------------------------------------------------------------------------
+
+/// A bookable offering of a business (e.g. "Haircut", "Stall #3 pickup").
+/// Capacity is *derived* from this config + DayOverride — slots are not
+/// stored as a long list; they're materialized on demand and cached in Redis
+/// (per AGENTS.md §8).
+model Service {
+  id              String   @id @default(cuid())
+  businessId      String
+  slug            String
+  name            String
+  description     String?
+  /// Duration of one slot in minutes (e.g. 5 = "1 slot every 5 min").
+  durationMin     Int
+  /// Maximum concurrent bookings for any one slot start (usually 1).
+  capacityPerSlot Int      @default(1)
+  /// Total bookings allowed for the day. NULL = unlimited.
+  dailyCapacity   Int?
+  /// Open / close in HH:mm business-local. Slot generation only emits
+  /// times within [openTime, closeTime - durationMin].
+  openTime        String
+  closeTime       String
+  /// Days of the week the service is offered. Bitmask: Sun=1, Mon=2, ... Sat=64.
+  /// (Kept as Int for portability; helper in shared package interprets it.)
+  daysOfWeekMask  Int      @default(127)
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  business Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  slots    Booking[]
+
+  @@unique([businessId, slug])
+  @@index([businessId])
+}
+
+// -----------------------------------------------------------------------------
+// Bookings
+// -----------------------------------------------------------------------------
+
+/// A customer's reservation of one slot for a service at a time.
+/// Status flows: pending → confirmed → (checked_in | no_show | cancelled).
+/// Bookings are never deleted — terminal states are the audit trail.
+model Booking {
+  id             String        @id @default(cuid())
+  tenantId       String
+  businessId     String
+  serviceId      String
+  /// slotStart is the canonical key for queue ordering.
+  /// Always UTC; web formats to business TZ.
+  slotStart      DateTime
+  /// Customer details — captured at booking time, not normalized into a
+  /// "Customer" table in v1 (walk-in businesses don't have repeat logins).
+  customerName   String
+  customerPhone  String
+  /// Optional notes from the customer ("please use the back entrance").
+  notes          String?
+  /// Where this booking came from. Walk-ins are added by the owner.
+  source         BookingSource @default(ONLINE)
+  status         BookingStatus @default(PENDING)
+  /// Idempotency key used at creation time, if any. Indexed for support
+  /// lookups ("did the customer's retry actually book?").
+  idempotencyKey String?
+  /// When the owner marked this booking as checked_in / no_show / etc.
+  resolvedAt     DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  business  Business   @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  service   Service    @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+  reminders Reminder[]
+  messages  Message[]
+
+  /// Hard rule from AGENTS.md §8: no two confirmed bookings for the same
+  /// service at the exact same slotStart. This is the database-level guard
+  /// the booking transaction relies on (in addition to capacityPerSlot
+  /// for >1 concurrency).
+  @@unique([serviceId, slotStart, customerPhone], name: "service_slot_phone_unique")
+  @@index([businessId, slotStart])
+  @@index([businessId, status, slotStart])
+  @@index([customerPhone])
+  @@index([tenantId])
+}
+
+// -----------------------------------------------------------------------------
+// Notifications
+// -----------------------------------------------------------------------------
+
+/// A scheduled reminder tied to a booking. The BullMQ queue is the runtime
+/// schedule; this table is the durable record so we can audit, re-queue on
+/// worker restart, and de-duplicate retries by `kind` per AGENTS.md §11.
+model Reminder {
+  id          String         @id @default(cuid())
+  bookingId   String
+  businessId  String
+  /// e.g. T-60, T-10, NO_SHOW_FOLLOWUP
+  kind        ReminderKind
+  /// When the job is scheduled to fire.
+  scheduledAt DateTime
+  /// BullMQ jobId — used to de-dupe (a re-enqueue with the same jobId is a no-op).
+  jobId       String         @unique
+  status      ReminderStatus @default(SCHEDULED)
+  /// When the worker actually sent the SMS.
+  sentAt      DateTime?
+  /// When a terminal failure happened.
+  failedAt    DateTime?
+  /// Last error message, for the audit log.
+  error       String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  booking  Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  /// Idempotency: a given booking may have at most one reminder of a kind.
+  /// This is the "natural key" the worker checks before enqueuing.
+  @@unique([bookingId, kind], name: "booking_kind_unique")
+  @@index([businessId, scheduledAt])
+  @@index([status, scheduledAt])
+}
+
+/// Audit log of every SMS the system sends. Per AGENTS.md §10: we never
+/// send without a stable templateId and a `vars` snapshot for replay.
+model Message {
+  id                String        @id @default(cuid())
+  tenantId          String
+  businessId        String
+  bookingId         String?
+  /// E.g. +639171234567. E.164 normalized.
+  toPhone           String
+  /// Stable template id from NotificationsService (e.g. "booking.confirmed").
+  templateId        String
+  /// Snapshot of variables passed to the template, for replay / audit.
+  vars              Json
+  /// Rendered body, captured at send time.
+  body              String
+  /// Provider-side message id (Semaphore / Twilio), for delivery status webhooks.
+  providerMessageId String?
+  status            MessageStatus @default(PENDING)
+  error             String?
+  sentAt            DateTime?
+  deliveredAt       DateTime?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  booking  Booking? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+
+  @@index([businessId, createdAt])
+  @@index([bookingId])
+  @@index([providerMessageId])
+  @@index([status])
+}
+
+// -----------------------------------------------------------------------------
+// Idempotency
+// -----------------------------------------------------------------------------
+
+/// Persisted response for every `Idempotency-Key` we honor, per
+/// AGENTS.md §7. A retry with the same key returns the same body — we
+/// never paper over with a synthetic 200.
+model IdempotencyKey {
+  id             String   @id @default(cuid())
+  tenantId       String
+  /// Client-supplied key.
+  key            String
+  /// Request fingerprint (method + path + body hash) so a reused key with
+  /// a *different* request body is rejected with IDEMPOTENCY_KEY_REUSED.
+  requestHash    String
+  /// HTTP status we returned the first time.
+  responseStatus Int
+  /// Cached response body, JSON-serialized.
+  responseBody   Json
+  expiresAt      DateTime
+  createdAt      DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, key])
+  @@index([expiresAt])
+}
+
+// -----------------------------------------------------------------------------
+// Observability
+// -----------------------------------------------------------------------------
+
+/// Append-only audit log of meaningful business events ("booking created",
+/// "booking cancelled", "walk-in added"). Per AGENTS.md §13 every entry
+/// carries the requestId for correlation.
+model AuditLog {
+  id          String   @id @default(cuid())
+  tenantId    String
+  /// Free-form event name, e.g. "booking.created".
+  event       String
+  /// Subject type + id, polymorphic. e.g. ("booking", "ckxyz").
+  subjectType String
+  subjectId   String
+  /// Actor — usually a User id; for customer actions, the booking id.
+  actorId     String?
+  /// Correlation id propagated from the request.
+  requestId   String?
+  /// Free-form JSON payload for the event.
+  payload     Json
+  createdAt   DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, event, createdAt])
+  @@index([subjectType, subjectId])
+}
+
+// -----------------------------------------------------------------------------
+// Enums
+// -----------------------------------------------------------------------------
+
+enum UserRole {
+  OWNER
+  ADMIN
+  STAFF
+}
+
+enum MembershipRole {
+  OWNER
+  MANAGER
+  STAFF
+}
+
+enum BookingStatus {
+  /// Created, awaiting SMS confirmation.
+  PENDING
+  /// Customer's slot is locked in.
+  CONFIRMED
+  /// Owner marked the customer as arrived and served (or in progress).
+  CHECKED_IN
+  /// Customer didn't show up. Terminal.
+  NO_SHOW
+  /// Customer or owner cancelled before slot. Terminal.
+  CANCELLED
+}
+
+enum BookingSource {
+  ONLINE // public booking flow
+  WALK_IN // added by the owner at the storefront
+  STAFF // staff pre-booked for a known customer
+  IMPORT // migrated from a previous system (v1: unused)
+}
+
+enum ReminderKind {
+  T_60 // 60 min before slot
+  T_10 // 10 min before slot
+  NO_SHOW_FOLLOWUP // sent X min after a missed slot
+}
+
+enum ReminderStatus {
+  SCHEDULED
+  SENT
+  FAILED
+  CANCELLED
+}
+
+enum MessageStatus {
+  PENDING
+  SENT
+  DELIVERED
+  FAILED
+  UNDELIVERED
+}

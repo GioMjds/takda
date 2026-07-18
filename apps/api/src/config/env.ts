@@ -1,0 +1,35 @@
+// Zod-validated env loader. Imported by ConfigModule.forRoot() and
+// re-exported as a typed `ENV` constant so app code never reads
+// `process.env` directly.
+//
+// Keep this file in sync with `.env.example` (kept in `.gitignore`
+// locally; the example is committed). All required keys are listed
+// in `envSchema` and will crash the process at boot if missing.
+
+import { z } from 'zod';
+
+const envSchema = z.object({
+  NODE_ENV: z
+    .enum(['development', 'test', 'production'])
+    .default('development'),
+  PORT: z.coerce.number().int().positive().default(3000),
+
+  DATABASE_URL: z.url(),
+
+  JWT_SECRET: z.string().min(32, 'JWT_SECRET must be ≥32 chars'),
+  JWT_ACCESS_TTL_SECONDS: z.coerce.number().int().positive().default(900), // 15 min
+  JWT_REFRESH_TTL_SECONDS: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(60 * 60 * 24 * 30), // 30 days
+
+  SMS_PROVIDER: z.enum(['semaphore', 'twilio']).default('semaphore'),
+  SMS_API_KEY: z.string().optional(), // required when SMS_PROVIDER is set in non-test envs
+
+  CORS_ORIGINS: z.string().default('http://localhost:3000'),
+});
+
+export type Env = z.infer<typeof envSchema>;
+
+export const ENV: Env = envSchema.parse(process.env);
