@@ -1,0 +1,51 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "back": "Back",
+    "submit": "Submit"
+  },
+  "login": {
+    "title": "Owner Login",
+    "subtitle": "Manage your walk-in queue and appointments",
+    "phone": "Phone Number",
+    "password": "Password",
+    "submit": "Sign In",
+    "noAccount": "Don't have an account?",
+    "register": "Register your business"
+  },
+  "onboarding": {
+    "title": "Setup Your Business",
+    "subtitle": "Get started with Takda in minutes",
+    "businessName": "Business Name",
+    "businessSlug": "Custom Link (Slug)",
+    "phone": "Contact Number",
+    "submit": "Create Business"
+  },
+  "dashboard": {
+    "title": "Live Queue",
+    "subtitle": "Monitor and manage walk-ins and bookings",
+    "tabs": {
+      "queue": "Queue",
+      "slots": "Slots",
+      "qr": "QR Code",
+      "analytics": "Analytics",
+      "settings": "Settings"
+    },
+    "noBookings": "No bookings for today yet."
+  },
+  "booking": {
+    "title": "Book an Appointment",
+    "subtitle": "Select a slot and reserve your turn",
+    "name": "Your Name",
+    "phone": "Phone Number",
+    "submit": "Confirm Booking"
+  },
+  "confirm": {
+    "title": "Booking Confirmed!",
+    "subtitle": "Your slot has been reserved.",
+    "queuePosition": "Your position in queue:",
+    "reminder": "You will receive an SMS reminder shortly."
+  }
+}

@@ -8,15 +8,28 @@ describe('AppController', () => {
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
       controllers: [AppController],
-      providers: [AppService],
+      providers: [
+        {
+          provide: AppService,
+          useValue: {
+            getHello: jest.fn().mockReturnValue({
+              message: 'Hello Takda! Welcome to the NestJS API!',
+              timestamp: new Date('2026-07-19T11:07:38+08:00'),
+            }),
+          },
+        },
+      ],
     }).compile();
 
     appController = app.get<AppController>(AppController);
   });
 
-  describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+  describe('getHello', () => {
+    it('should return hello message', () => {
+      expect(appController.getHello()).toEqual({
+        message: 'Hello Takda! Welcome to the NestJS API!',
+        timestamp: new Date('2026-07-19T11:07:38+08:00'),
+      });
     });
   });
 });

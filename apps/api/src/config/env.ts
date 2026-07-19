@@ -6,7 +6,10 @@
 // locally; the example is committed). All required keys are listed
 // in `envSchema` and will crash the process at boot if missing.
 
+import dotenv from 'dotenv';
 import { z } from 'zod';
+
+dotenv.config();
 
 const envSchema = z.object({
   NODE_ENV: z

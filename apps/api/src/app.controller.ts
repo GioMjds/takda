@@ -1,12 +1,13 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { AppService } from './app.service';
+import { HttpQuery } from './common/decorators';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get()
-  getHello(): string {
+  @HttpQuery()
+  getHello(): { message: string; timestamp: Date } {
     return this.appService.getHello();
   }
 }

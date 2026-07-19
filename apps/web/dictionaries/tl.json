@@ -1,0 +1,51 @@
+{
+  "common": {
+    "loading": "Naglo-load...",
+    "save": "I-save",
+    "cancel": "Kanselahin",
+    "back": "Bumalik",
+    "submit": "Ipadala"
+  },
+  "login": {
+    "title": "Login ng May-ari",
+    "subtitle": "Pamahalaan ang iyong pila at mga appointment",
+    "phone": "Numero ng Telepono",
+    "password": "Password",
+    "submit": "Mag-sign In",
+    "noAccount": "Walang account?",
+    "register": "Iparehistro ang iyong negosyo"
+  },
+  "onboarding": {
+    "title": "I-setup ang Iyong Negosyo",
+    "subtitle": "Magsimula sa Takda sa loob ng ilang minuto",
+    "businessName": "Pangalan ng Negosyo",
+    "businessSlug": "Custom Link (Slug)",
+    "phone": "Numero ng Kontakt",
+    "submit": "Gumawa ng Negosyo"
+  },
+  "dashboard": {
+    "title": "Live na Pila",
+    "subtitle": "Subaybayan at pamahalaan ang mga walk-in at booking",
+    "tabs": {
+      "queue": "Pila",
+      "slots": "Mga Slot",
+      "qr": "QR Code",
+      "analytics": "Analytics",
+      "settings": "Mga Setting"
+    },
+    "noBookings": "Walang mga booking para sa araw na ito."
+  },
+  "booking": {
+    "title": "Mag-book ng Appointment",
+    "subtitle": "Pumili ng slot at i-reserve ang iyong pila",
+    "name": "Iyong Pangalan",
+    "phone": "Numero ng Telepono",
+    "submit": "Kumpirmahin ang Booking"
+  },
+  "confirm": {
+    "title": "Kumpirmado na ang Booking!",
+    "subtitle": "Na-reserve na ang iyong slot.",
+    "queuePosition": "Iyong posisyon sa pila:",
+    "reminder": "Makakatanggap ka ng SMS reminder sa madaling panahon."
+  }
+}

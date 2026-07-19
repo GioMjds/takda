@@ -9,6 +9,8 @@
     "allowSyntheticDefaultImports": true,
     "target": "esnext",
     "sourceMap": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
     "incremental": true,
     "strictNullChecks": true,
     "noImplicitAny": true,

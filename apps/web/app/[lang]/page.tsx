@@ -1,65 +1,53 @@
-import Image from 'next/image';
+import Link from 'next/link';
+import { getDictionary } from '@/lib/i18n';
+import type { Locale } from '@/lib/i18n';
+import type { Route } from 'next';
 
-export default function Home() {
+export default async function HomePage({ params }: PageProps<'/[lang]'>) {
+  const { lang } = await params;
+  const dict = await getDictionary(lang as Locale);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <main className="min-h-screen flex flex-col justify-center items-center px-4 py-12 sm:px-6 lg:px-8 bg-[#f7fafa]">
+      <div className="max-w-md w-full text-center space-y-8 bg-white p-8 rounded-2xl shadow-sm border border-[#a8ddd4]/30">
+        <div className="space-y-3">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#1a8c75]/10 text-[#1a8c75] font-bold text-2xl tracking-wider">
+            T
+          </div>
+          <h1 className="text-4xl font-extrabold tracking-tight text-[#0d4f43]">
+            Takda
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{' '}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{' '}
-            or the{' '}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{' '}
-            center.
+          <p className="text-sm text-[#0d4f43]/70 font-medium">
+            {lang === 'en'
+              ? 'Queue & Appointment booking made simple.'
+              : 'Mas madaling pila at appointment booking para sa lahat.'}
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+
+        <div className="mt-8 space-y-4">
+          <Link
+            href={`/${lang}/login` as Route}
+            className="w-full flex items-center justify-center px-4 py-3 border border-transparent text-sm font-semibold rounded-xl text-white bg-[#1a8c75] hover:bg-[#0d4f43] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1a8c75] transition duration-200"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            {dict.login.title}
+          </Link>
+          <Link
+            href={`/${lang}/onboarding` as Route}
+            className="w-full flex items-center justify-center px-4 py-3 border border-[#1a8c75]/30 text-sm font-semibold rounded-xl text-[#1a8c75] bg-[#1a8c75]/5 hover:bg-[#1a8c75]/10 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1a8c75] transition duration-200"
           >
-            Documentation
-          </a>
+            {dict.onboarding.title}
+          </Link>
         </div>
-      </main>
-    </div>
+
+        <div className="pt-6 border-t border-gray-100 flex justify-center gap-4 text-xs font-semibold text-[#1a8c75]">
+          <Link
+            href={(lang === 'en' ? '/tl' : '/en') as Route}
+            className="hover:underline"
+          >
+            {lang === 'en' ? 'Mag-Tagalog' : 'Switch to English'}
+          </Link>
+        </div>
+      </div>
+    </main>
   );
 }

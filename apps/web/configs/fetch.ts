@@ -1,4 +1,11 @@
-export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+export type HttpMethod =
+  | 'GET'
+  | 'POST'
+  | 'PUT'
+  | 'PATCH'
+  | 'DELETE'
+  | 'OPTIONS'
+  | 'QUERY';
 
 export interface FetchConfig {
   headers?: HeadersInit;
@@ -178,6 +185,12 @@ export const http = {
 
   delete: <TResponse>(path: string, config?: FetchConfig) =>
     fetchFactory<TResponse>(path, { ...config, method: 'DELETE' }),
+
+  options: <TResponse>(path: string, config?: FetchConfig) =>
+    fetchFactory<TResponse>(path, { ...config, method: 'OPTIONS' }),
+
+  query: <TResponse>(path: string, body?: unknown, config?: FetchConfig) =>
+    fetchFactory<TResponse>(path, { ...config, method: 'QUERY', body }),
 };
 
 export function createEndpoint(prefix: string) {
@@ -199,6 +212,12 @@ export function createEndpoint(prefix: string) {
 
     delete: <TResponse>(path: string, config?: FetchConfig) =>
       http.delete<TResponse>(fullPath(path), config),
+
+    options: <TResponse>(path: string, config?: FetchConfig) =>
+      http.options<TResponse>(fullPath(path), config),
+
+    query: <TResponse>(path: string, body?: unknown, config?: FetchConfig) =>
+      http.query<TResponse>(fullPath(path), body, config),
   };
 }
 

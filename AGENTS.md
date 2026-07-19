@@ -135,6 +135,85 @@ A change is "done" only when **all** of these are true:
 5. It does not regress an existing test, typecheck, or build.
 6. It does not introduce a TODO without an owner and a target date.
 
+### 4.5 Workspace execution rules
+
+- **Do not use root `turbo` scripts** if working in a specific workspace (e.g., `web`, `api`, `shared`) to run bash or any other scripting commands. Navigate to that workspace or run workspace-specific commands directly via pnpm (e.g. `pnpm --filter @takda/web <command>` or run command inside the workspace directory).
+
+### 4.6 Next.js (App Router) & Web Architecture
+
+- **Separation of Concerns via `apps/web/pages/<route-name>`**: Next.js App Router routing files (`page.tsx`, `layout.tsx`, `template.tsx`) in `apps/web/app/` should remain thin wrappers that import their core presentation and state components from `apps/web/pages/<route-name>/`.
+  - Inside `apps/web/pages/<route-name>/`, structure directories as:
+    - `hooks/`: Page-specific custom hooks (e.g., form handlers, RHF setup, state hooks).
+    - `api/`: API call files incorporating `apps/web/configs/fetch.ts`, named after the HTTP method (e.g., `GET.ts`, `POST.ts`, `PUT.ts`, `DELETE.ts`).
+    - `sections/`: UI layout sections and sub-components specific to this route.
+    - `index.ts`: Barrel file exporting views, custom hooks, and sections.
+  - Map route paths declared in `apps/web/app` to their `pages` equivalent:
+    - `app/[lang]/page.tsx` $\rightarrow$ `pages/[lang]/`
+    - `app/[lang]/(auth)/login/page.tsx` $\rightarrow$ `pages/[lang]/login/`
+    - `app/[lang]/(customer)/b/[businessSlug]/page.tsx` $\rightarrow$ `pages/[lang]/b/[businessSlug]/`
+    - `app/[lang]/(customer)/b/[businessSlug]/confirm/page.tsx` $\rightarrow$ `pages/[lang]/b/[businessSlug]/confirm/`
+    - `app/[lang]/(onboarding)/onboarding/page.tsx` $\rightarrow$ `pages/[lang]/onboarding/`
+    - `app/[lang]/(owner)/dashboard/page.tsx` $\rightarrow$ `pages/[lang]/dashboard/`
+
+- **Typecheck & Typed Routes**: Always run typecheck (`pnpm typecheck` inside `apps/web`) to validate typed routes and link path correctness.
+
+- **Props Typing**: Always type page files using the globally available `PageProps<TRoute>` and layout files using `LayoutProps<TRoute>`. Next.js typegen automatically infers parameters and searchParams from the route path provided as the generic argument.
+  - Due to Next.js 15/16 rendering updates, `params` and `searchParams` are async and must be awaited before accessing:
+    ```typescript
+    // Example for app/[lang]/page.tsx
+    export default async function HomePage({ params }: PageProps<'/[lang]'>) {
+      const { lang } = await params;
+      // ...
+    }
+
+    // Example for app/[lang]/layout.tsx
+    export default async function RootLayout({
+      children,
+      params,
+    }: LayoutProps<'/[lang]'>) {
+      const { lang } = await params;
+      // ...
+    }
+    ```
+  - Map dynamic routes correctly by omitting route grouping folders from the route path argument (e.g., `PageProps<'/[lang]/login'>` for `app/[lang]/(auth)/login/page.tsx` and `PageProps<'/[lang]/b/[businessSlug]'>` for `app/[lang]/(customer)/b/[businessSlug]/page.tsx`).
+
+- **Route Grouping**: Prioritize route grouping (`(auth)`, `(customer)`, `(owner)`) for different layouts and page routing structures. Always create a `layout.tsx` file inside any newly created route group folder.
+
+- **Template Files (`template.tsx`)**: Use `template.tsx` only when you need Next.js to recreate the component instance on route navigation (e.g. to trigger entrance/exit animations with Framer Motion, reset local state, or run a `useEffect` hook on every transition). Otherwise, prefer persistent `layout.tsx` files.
+
+- **Loading States (`loading.tsx`)**: Implement `loading.tsx` at key route levels to leverage React Streaming. Skeletons must be styled using **shadcn's Skeleton UI** primitives instead of spinner/fallback placeholders to match layout dimensions and reduce cumulative layout shift.
+
+- **Not Found Handling (`not-found.tsx`)**: Provide `not-found.tsx` components in dynamic routes (e.g., `[businessSlug]`). Trigger these by calling Next.js's native `notFound()` function when a resource dynamic segment is invalid or database lookups return null.
+
+- **Dynamic Segments**: Ensure proper type validation of dynamic route segments in `PageProps` and strictly validate segment variables server-side using `@takda/shared` schemas.
+
+- **Intercepting Routes**: Implement intercepting routes (e.g., `(.)` relative or `(..)` parent segment directories) to load modal dialogues (e.g., slot selection or quick owner actions) while keeping the background context intact and retaining shareable URLs.
+
+- **Parallel Routes**: Use parallel route slots (e.g., `@modal`, `@tabs`) inside a layout file to render multiple views concurrently or conditionally in the same workspace layout.
+
+- **Link & Image Optimization**:
+  - Always use `next/image` with responsive `sizes` (e.g., `sizes="(max-width: 768px) 100vw, 33vw"`) and preset aspect-ratio configurations to avoid layout shifts.
+  - Use `loading="lazy"` (Next.js default) for below-the-fold images to defer non-critical assets.
+  - Use the `priority` attribute explicitly for above-the-fold elements (such as hero graphics or logo assets) to boost LCP scores.
+  - Utilize `placeholder="blur"` (with static imports or a `blurDataURL` for dynamic assets) to deliver a polished visual loading state.
+  - Always supply meaningful, screen-reader-friendly `alt` descriptions (avoid redundant words like "image" or "logo").
+  - Always use `next/link` for internal transitions and ensure typed routing configs (`experimental.typedRoutes`) are active and valid.
+
+- **SEO, Semantic HTML & Accessibility (ARIA)**:
+  - Structural blocks must use semantic HTML5 elements (`<header>`, `<main>`, `<nav>`, `<section>`, `<article>`, `<footer>`, `<aside>`).
+  - Maintain a single `<h1>` per page for search engine crawlers, preserving sequential, non-skipping heading flows (`<h2>` to `<h6>`).
+  - Implement descriptive ARIA properties to expose active elements and states to screen readers (e.g., `aria-label`, `aria-describedby`, `aria-expanded` for toggles, and `aria-live="polite"`/`role="status"` for dynamic updates like queue statuses).
+
+- **Directives Constraints**:
+  - `'use client'`: Mark files containing hooks (`useState`, `useEffect`), event handlers, browser APIs, or animation libraries (e.g., `motion`).
+  - `'use server'`: Restrict only to files or functions serving as entry points for Server Actions. Do not mix server actions inside client component files.
+  - `'use cache'`: Utilize at database query or expensive calculation boundaries to cache server-rendered properties.
+  - **Server-Side vs. Client-Side Page Components**: To ensure maximum SEO indexability and fast page loads, the main route page (`page.tsx`) and the top-level route barrel file (`pages/<route-name>/index.ts`) must remain **Server Components** by default.
+  - **Integrating Animations & Transitions**: If a page requires transitions, page entrance animations, or hover micro-interactions via `motion`:
+    - Do not mark the entire page as a Client Component.
+    - Encapsulate the animated portions inside specific child components within `pages/<route-name>/sections/` and mark _only_ those sub-components with `'use client'`.
+    - Import these animated sub-components back into the parent Server Component. This retains the semantic SEO structure on the initial server render while cleanly applying client-side animations after hydration.
+
 ---
 
 ## 5. Testing
