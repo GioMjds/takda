@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
 import { HttpQuery } from './common/decorators';
 
@@ -6,8 +6,13 @@ import { HttpQuery } from './common/decorators';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
+  @Get()
+  getHelloGet() {
+    return this.appService.getHello();
+  }
+
   @HttpQuery()
-  getHello(): { message: string; timestamp: Date } {
+  getHello() {
     return this.appService.getHello();
   }
 }

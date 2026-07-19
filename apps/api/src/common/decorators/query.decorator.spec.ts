@@ -41,4 +41,13 @@ describe('Query Decorator', () => {
       message: 'QUERY decorator works!',
     });
   });
+
+  it('should reject requests with standard HTTP methods like GET', async () => {
+    const server = app.getHttpServer();
+    const res = await supertest(server)
+      .get('/test-decorator/custom-query')
+      .send();
+
+    expect(res.status).toBe(403);
+  });
 });

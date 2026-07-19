@@ -10,10 +10,20 @@
     "title": "Login ng May-ari",
     "subtitle": "Pamahalaan ang iyong pila at mga appointment",
     "phone": "Numero ng Telepono",
+    "email": "Email",
     "password": "Password",
-    "submit": "Mag-sign In",
+    "submit": "Mag-sign in",
     "noAccount": "Walang account?",
-    "register": "Iparehistro ang iyong negosyo"
+    "register": "Iparehistro ang iyong negosyo",
+    "heading": "Maligayang pagbabalik",
+    "subheading": "Mag-sign in sa iyong Takda business account",
+    "emailPlaceholder": "owner@example.com",
+    "error": {
+      "invalid": "Mali ang email o password. Subukan muli.",
+      "network": "Hindi maabot ang server. Suriin ang koneksyon at subukan muli.",
+      "generic": "May nangyaring mali. Subukan muli."
+    },
+    "footer": "Kailangan ng access? Makipag-ugnayan sa iyong Takda admin."
   },
   "onboarding": {
     "title": "I-setup ang Iyong Negosyo",

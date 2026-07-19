@@ -1,4 +1,0 @@
-
-> @takda/api@0.0.1 lint C:\Users\giomj\OneDrive\Desktop\takda\apps\api
-> eslint "{src,apps,libs,test}/**/*.ts" --fix
-

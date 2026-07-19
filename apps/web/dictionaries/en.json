@@ -10,10 +10,20 @@
     "title": "Owner Login",
     "subtitle": "Manage your walk-in queue and appointments",
     "phone": "Phone Number",
+    "email": "Email",
     "password": "Password",
-    "submit": "Sign In",
+    "submit": "Sign in",
     "noAccount": "Don't have an account?",
-    "register": "Register your business"
+    "register": "Register your business",
+    "heading": "Welcome back",
+    "subheading": "Sign in to your Takda business account",
+    "emailPlaceholder": "owner@example.com",
+    "error": {
+      "invalid": "Incorrect email or password. Try again.",
+      "network": "Can't reach the server. Check your connection and try again.",
+      "generic": "Something went wrong. Please try again."
+    },
+    "footer": "Need access? Contact your Takda admin."
   },
   "onboarding": {
     "title": "Setup Your Business",

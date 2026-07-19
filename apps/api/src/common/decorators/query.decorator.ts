@@ -1,4 +1,19 @@
-import { RequestMapping } from '@nestjs/common';
+import {
+  applyDecorators,
+  All,
+  UseGuards,
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+} from '@nestjs/common';
+
+@Injectable()
+class QueryMethodGuard implements CanActivate {
+  canActivate(context: ExecutionContext): boolean {
+    const request = context.switchToHttp().getRequest();
+    return request.method === 'QUERY';
+  }
+}
 
 /**
  * Route handler decorator for HTTP QUERY requests.
@@ -8,8 +23,5 @@ import { RequestMapping } from '@nestjs/common';
  * @param path String or array of strings representing the path(s) to match.
  */
 export function HttpQuery(path?: string | string[]): MethodDecorator {
-  return RequestMapping({
-    path,
-    method: 'QUERY' as any,
-  });
+  return applyDecorators(All(path), UseGuards(QueryMethodGuard));
 }

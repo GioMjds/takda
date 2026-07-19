@@ -20,7 +20,9 @@ describe('AppController (e2e)', () => {
     return request(app.getHttpServer())
       .get('/')
       .expect(200)
-      .expect('Hello World!');
+      .expect((res) => {
+        expect(res.body.message).toBe('Hello Takda! Welcome to the NestJS API!');
+      });
   });
 
   afterEach(async () => {

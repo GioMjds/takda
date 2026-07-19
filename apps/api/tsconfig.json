@@ -12,6 +12,7 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "incremental": true,
+    "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
     "strictNullChecks": true,
     "noImplicitAny": true,
     "paths": {

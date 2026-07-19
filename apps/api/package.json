@@ -1,15 +1,15 @@
 {
   "name": "@takda/api",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "description": "Takda API",
+  "author": "giomjds",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "dev": "nest start --watch",
     "start": "nest start",
-    "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",

@@ -1,53 +1,74 @@
-import Link from 'next/link';
-import { getDictionary } from '@/lib/i18n';
-import type { Locale } from '@/lib/i18n';
-import type { Route } from 'next';
+import {
+  NavBar,
+  HeroSection,
+  DemoFrame,
+  FeaturesSection,
+  FooterBar,
+} from '@/pages/[lang]/_index';
 
 export default async function HomePage({ params }: PageProps<'/[lang]'>) {
   const { lang } = await params;
-  const dict = await getDictionary(lang as Locale);
 
   return (
-    <main className="min-h-screen flex flex-col justify-center items-center px-4 py-12 sm:px-6 lg:px-8 bg-[#f7fafa]">
-      <div className="max-w-md w-full text-center space-y-8 bg-white p-8 rounded-2xl shadow-sm border border-[#a8ddd4]/30">
-        <div className="space-y-3">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#1a8c75]/10 text-[#1a8c75] font-bold text-2xl tracking-wider">
-            T
-          </div>
-          <h1 className="text-4xl font-extrabold tracking-tight text-[#0d4f43]">
-            Takda
-          </h1>
-          <p className="text-sm text-[#0d4f43]/70 font-medium">
-            {lang === 'en'
-              ? 'Queue & Appointment booking made simple.'
-              : 'Mas madaling pila at appointment booking para sa lahat.'}
-          </p>
-        </div>
+    <div
+      className="
+        relative isolate min-h-screen w-full overflow-hidden
+        bg-[#0a1f1a] text-[#e8f5ef]
+        font-sans
+      "
+    >
+      {/* Subtle grid overlay — gives the page a structural, technical
+          feel without committing to a terminal aesthetic. Lower alpha
+          on smaller viewports to avoid moiré on phone screens. */}
+      <div
+        aria-hidden="true"
+        className="
+          pointer-events-none absolute inset-0 z-0
+          bg-[linear-gradient(to_right,rgba(168,221,212,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(168,221,212,0.06)_1px,transparent_1px)]
+          bg-size-[64px_64px]
+          mask-[radial-gradient(ellipse_80%_60%_at_50%_30%,#000_55%,transparent_100%)]
+        "
+      />
 
-        <div className="mt-8 space-y-4">
-          <Link
-            href={`/${lang}/login` as Route}
-            className="w-full flex items-center justify-center px-4 py-3 border border-transparent text-sm font-semibold rounded-xl text-white bg-[#1a8c75] hover:bg-[#0d4f43] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1a8c75] transition duration-200"
-          >
-            {dict.login.title}
-          </Link>
-          <Link
-            href={`/${lang}/onboarding` as Route}
-            className="w-full flex items-center justify-center px-4 py-3 border border-[#1a8c75]/30 text-sm font-semibold rounded-xl text-[#1a8c75] bg-[#1a8c75]/5 hover:bg-[#1a8c75]/10 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1a8c75] transition duration-200"
-          >
-            {dict.onboarding.title}
-          </Link>
-        </div>
+      {/* Teal radial glow — top-left. Anchors the brand color where the
+          eye lands first and gives the H1 a warm-cool contrast. */}
+      <div
+        aria-hidden="true"
+        className="
+          pointer-events-none absolute -top-40 -left-40 z-0
+          h-160 w-160 rounded-full
+          bg-[radial-gradient(circle,rgba(29,158,117,0.35)_0%,rgba(29,158,117,0.08)_45%,transparent_72%)]
+          blur-3xl
+        "
+      />
 
-        <div className="pt-6 border-t border-gray-100 flex justify-center gap-4 text-xs font-semibold text-[#1a8c75]">
-          <Link
-            href={(lang === 'en' ? '/tl' : '/en') as Route}
-            className="hover:underline"
-          >
-            {lang === 'en' ? 'Mag-Tagalog' : 'Switch to English'}
-          </Link>
-        </div>
+      {/* Amber radial glow — bottom-right. Counterweight to the teal
+          glow; keeps the page from feeling monochrome. Both are at
+          low alpha so the grid remains readable through them. */}
+      <div
+        aria-hidden="true"
+        className="
+          pointer-events-none absolute -bottom-48 -right-32 z-0
+          h-140 w-140 rounded-full
+          bg-[radial-gradient(circle,rgba(217,158,73,0.22)_0%,rgba(217,158,73,0.06)_45%,transparent_72%)]
+          blur-3xl
+        "
+      />
+
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 z-0 h-px bg-white/6"
+      />
+
+      <div className="relative z-10 flex min-h-screen flex-col">
+        <NavBar lang={lang} />
+        <main className="flex-1">
+          <HeroSection lang={lang} />
+          <DemoFrame lang={lang} />
+          <FeaturesSection lang={lang} />
+        </main>
+        <FooterBar lang={lang} />
       </div>
-    </main>
+    </div>
   );
 }

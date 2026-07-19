@@ -1,18 +1,17 @@
 import '../globals.css';
 import type { Metadata, Viewport } from 'next';
-import { Google_Sans, Raleway } from 'next/font/google';
+import { Raleway } from 'next/font/google';
 import { ThemeProvider } from '@/lib/theme-provider';
 import Providers from '../providers';
 import { notFound } from 'next/navigation';
 
-const googleSans = Google_Sans({
-  variable: '--font-google-sans',
-  subsets: ['latin'],
-});
-
 const raleway = Raleway({
   variable: '--font-raleway',
   subsets: ['latin'],
+  // Marketing surfaces use the full weight range (200-900). The page
+  // does not import this font directly — it reads `var(--font-raleway)`
+  // via the marketing layout's display token.
+  weight: ['200', '300', '400', '500', '600', '700', '800', '900'],
 });
 
 export const viewport: Viewport = {
@@ -36,12 +35,16 @@ export async function generateMetadata({
   const { lang } = await params;
   return {
     title: {
-      default: lang === 'tl' ? 'Takda - Pila at Appointment' : 'Takda - Queue & Appointments',
+      default:
+        lang === 'tl'
+          ? 'Takda - Pila at Appointment'
+          : 'Takda - Queue & Appointments',
       template: '%s | Takda',
     },
-    description: lang === 'tl'
-      ? 'Sistema para sa mas madaling pila at appointment booking.'
-      : 'Queue and appointment booking platform for walk-in businesses.',
+    description:
+      lang === 'tl'
+        ? 'Sistema para sa mas madaling pila at appointment booking.'
+        : 'Queue and appointment booking platform for walk-in businesses.',
   };
 }
 
@@ -71,7 +74,7 @@ export default async function RootLayout({
         />
       </head>
       <body
-        className={`${googleSans.variable} ${raleway.variable} antialiased font-sans bg-[#f7fafa] text-[#0d4f43]`}
+        className={`${raleway.variable} antialiased font-sans font-display bg-[#f7fafa] text-[#0d4f43]`}
       >
         <ThemeProvider
           attribute="class"

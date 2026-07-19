@@ -41,10 +41,7 @@ import { AppService } from './app.service';
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         storage: {
-          adapter: StorageAdapterEnum.redis,
-          options: {
-            url: configService.get<string>('REDIS_URL') || '',
-          },
+          adapter: StorageAdapterEnum.memory,
         },
         cacheTTLMS: configService.get<number>(
           'IDEMPOTENCY_CACHE_TTL_MS',

@@ -2,9 +2,15 @@
   "name": "takda",
   "description": "No more pila chaos",
   "private": true,
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "10.13.1"
+    }
+  },
   "packageManager": "pnpm@10.13.1",
   "scripts": {
-    "dev": "turbo run dev",
+    "dev": "turbo dev --ui=tui",
     "build": "turbo run build",
     "lint": "turbo run lint",
     "test": "turbo run test"

@@ -80,10 +80,18 @@ export function proxy(req: NextRequest) {
   const isDashboardRoute = LOCALES.some((locale) =>
     pathname.startsWith(`/${locale}/dashboard`)
   );
+  const isLoginRoute = LOCALES.some((locale) =>
+    pathname === `/${locale}/login` || pathname.startsWith(`/${locale}/login/`)
+  );
 
   if (isDashboardRoute && !token) {
     const locale = LOCALES.find((l) => pathname.startsWith(`/${l}/`)) || DEFAULT_LOCALE;
     return NextResponse.redirect(new URL(`/${locale}/login${search}` as Route, req.url));
+  }
+
+  if (isLoginRoute && token) {
+    const locale = LOCALES.find((l) => pathname.startsWith(`/${l}/`)) || DEFAULT_LOCALE;
+    return NextResponse.redirect(new URL(`/${locale}/dashboard${search}` as Route, req.url));
   }
 
   return NextResponse.next();

@@ -28,6 +28,8 @@ async function bootstrap(): Promise<void> {
         : ['error', 'warn', 'log', 'debug', 'verbose'],
   });
 
+  const port = ENV.PORT;
+
   app.use(cookieParser());
 
   app.useGlobalPipes(
@@ -54,8 +56,8 @@ async function bootstrap(): Promise<void> {
     ],
   });
 
-  await app.listen(ENV.PORT);
-  new Logger('Bootstrap').log(`API listening on :${ENV.PORT}`);
+  await app.listen(port);
+  new Logger('Bootstrap').log(`API listening on :${port}`);
 }
 
 void bootstrap();

@@ -4,10 +4,7 @@ import type { Route } from 'next';
 export default async function BusinessLayout({
   children,
   params,
-}: {
-  children: React.ReactNode;
-  params: Promise<{ lang: string; businessSlug: string }>;
-}) {
+}: LayoutProps<'/[lang]/b/[businessSlug]'>) {
   const { lang, businessSlug } = await params;
 
   return (
@@ -28,7 +25,9 @@ export default async function BusinessLayout({
           </Link>
           <div className="text-xs font-semibold text-[#1a8c75]">
             <Link
-              href={`/${lang === 'en' ? 'tl' : 'en'}/b/${businessSlug}` as Route}
+              href={
+                `/${lang === 'en' ? 'tl' : 'en'}/b/${businessSlug}` as Route
+              }
               className="hover:underline"
             >
               {lang === 'en' ? 'Tagalog' : 'English'}
