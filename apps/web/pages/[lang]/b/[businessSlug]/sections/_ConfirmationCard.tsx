@@ -5,7 +5,7 @@ import { CheckCircle2, MapPin, Calendar, Users, MessageSquare } from 'lucide-rea
 import type { Booking } from '@takda/shared';
 
 export interface ConfirmationCardProps {
-  booking: Booking & { queuePosition: number };
+  booking: Booking & { queuePosition?: number };
   businessName: string;
   businessAddress?: string | null;
   lang: string;
@@ -108,7 +108,7 @@ export default function ConfirmationCard({
               aria-live="polite" 
               className="font-extrabold text-2xl text-[#0d4f43] tracking-tight"
             >
-              #{booking.queuePosition}
+              #{booking.queuePosition ?? 1}
             </p>
             <p className="text-xs text-[#0d4f43]/60 font-medium">
               {lang === 'en' 

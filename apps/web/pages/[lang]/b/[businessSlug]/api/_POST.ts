@@ -1,16 +1,21 @@
 import { http } from '@/configs/fetch';
-import type { CreateBookingInput, Booking } from '@takda/shared';
-
-export interface BookingResponse {
-  booking: Booking & { queuePosition: number };
-  message: string;
-}
+import type { CreateBookingInput, QueueTokenResponse } from '@takda/shared';
 
 export async function createBooking(
+  businessSlug: string,
   body: CreateBookingInput,
-): Promise<BookingResponse> {
+  idempotencyKey?: string,
+): Promise<QueueTokenResponse> {
   try {
-    return await http.post<BookingResponse>('/bookings', body);
+    const headers: Record<string, string> = {};
+    if (idempotencyKey) {
+      headers['Idempotency-Key'] = idempotencyKey;
+    }
+    return await http.post<QueueTokenResponse>(
+      `/v1/businesses/${businessSlug}/bookings`,
+      body,
+      { headers },
+    );
   } catch (error) {
     console.warn(
       'API booking creation failed, falling back to mock response:',
@@ -21,12 +26,12 @@ export async function createBooking(
     await new Promise((resolve) => setTimeout(resolve, 800));
 
     // Return a mock response for frontend demonstration
-    const mockBooking: Booking & { queuePosition: number } = {
+    const mockBooking: any = {
       id: `bk-${Math.random().toString(36).substring(2, 9)}`,
       tenantId: 'tn-default',
       businessId: 'bz-default',
       serviceId: body.serviceId,
-      slotStart: new Date(body.slotStart),
+      slotStart: body.slotStart,
       customerName: body.customerName,
       customerPhone: body.customerPhone,
       notes: body.notes || null,
@@ -34,14 +39,14 @@ export async function createBooking(
       status: 'CONFIRMED',
       idempotencyKey: null,
       resolvedAt: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      queuePosition: Math.floor(Math.random() * 5) + 1,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
 
     return {
       booking: mockBooking,
-      message: 'Booking created successfully (offline demo mode)',
+      queueToken: 'mock-queue-token-xyz',
+      queueTokenExpiresAt: new Date(Date.now() + 86400000).toISOString(),
     };
   }
 }

@@ -2,15 +2,21 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import type { Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/navigation';
 import { createBookingInputSchema } from '@takda/shared';
-import type { CreateBookingInput } from '@takda/shared';
+import type { CreateBookingInput, QueueTokenResponse } from '@takda/shared';
 import { createBooking } from '../api/_POST';
-import type { BookingResponse } from '../api/_POST';
 
-export function useBookingForm(serviceId: string, slotStart: string) {
+export function useBookingForm(
+  serviceId: string,
+  slotStart: string,
+  businessSlug?: string,
+  lang: string = 'tl',
+) {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [successData, setSuccessData] = useState<BookingResponse | null>(null);
+  const [successData, setSuccessData] = useState<QueueTokenResponse | null>(null);
 
   const form = useForm<CreateBookingInput>({
     resolver: zodResolver(createBookingInputSchema as unknown as Parameters<typeof zodResolver>[0]) as unknown as Resolver<CreateBookingInput>,
@@ -33,8 +39,20 @@ export function useBookingForm(serviceId: string, slotStart: string) {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await createBooking(data);
+      const idempotencyKey =
+        typeof crypto !== 'undefined' && crypto.randomUUID
+          ? crypto.randomUUID()
+          : `idempotency-${Date.now()}`;
+      const response = await createBooking(
+        businessSlug || '',
+        data,
+        idempotencyKey,
+      );
       setSuccessData(response);
+      if (businessSlug && response.booking?.id) {
+        const confirmUrl = `/${lang}/b/${businessSlug}/confirm?booking=${response.booking.id}&token=${response.queueToken}&phone=${encodeURIComponent(data.customerPhone)}`;
+        router.push(confirmUrl as any);
+      }
     } catch (err: unknown) {
       const errMsg = err instanceof Error ? err.message : 'Failed to submit booking. Please try again.';
       setError(errMsg);

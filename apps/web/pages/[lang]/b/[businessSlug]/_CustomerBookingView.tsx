@@ -15,7 +15,7 @@ export interface CustomerBookingViewProps {
   services: Service[];
   slots: Slot[];
   lang: string;
-  dict: Record<string, Record<string, string>>;
+  dict: Record<string, any>;
 }
 
 export default function CustomerBookingView({
@@ -42,7 +42,7 @@ export default function CustomerBookingView({
     successData,
     onSubmit,
     resetForm,
-  } = useBookingForm(selectedServiceId, selectedSlotStart);
+  } = useBookingForm(selectedServiceId, selectedSlotStart, business?.slug, lang);
 
   if (!business || !dict) {
     return null;
