@@ -20,7 +20,7 @@ import { BookingChangedEvent } from '../bookings/events/booking-changed.event';
 @UseFilters(WsExceptionFilter)
 export class QueueGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
-  server: Server;
+  server!: Server;
 
   private readonly snapshotTimers = new Map<string, NodeJS.Timeout>();
 
@@ -93,14 +93,12 @@ export class QueueGateway implements OnGatewayConnection, OnGatewayDisconnect {
         slotStart: event.slotStart,
       });
 
-    try {
-      const pos = await this.queueService.computePositionForBooking(
-        event.bookingId,
-      );
-      this.server
-        .to(`queue:booking:${event.bookingId}`)
-        .emit('queue.position', pos);
-    } catch {}
+    const pos = await this.queueService.computePositionForBooking(
+      event.bookingId,
+    );
+    this.server
+      .to(`queue:booking:${event.bookingId}`)
+      .emit('queue.position', pos);
   }
 
   private scheduleSnapshotBroadcast(businessId: string) {
@@ -108,12 +106,11 @@ export class QueueGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     const timer = setTimeout(async () => {
       this.snapshotTimers.delete(businessId);
-      try {
-        const snapshot = await this.queueService.computeSnapshot(businessId);
-        this.server
-          .to(`queue:business:${businessId}`)
-          .emit('queue.snapshot', snapshot);
-      } catch {}
+
+      const snapshot = await this.queueService.computeSnapshot(businessId);
+      this.server
+        .to(`queue:business:${businessId}`)
+        .emit('queue.snapshot', snapshot);
     }, 2000);
 
     this.snapshotTimers.set(businessId, timer);
