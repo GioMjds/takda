@@ -17,27 +17,10 @@ export interface DemoFrameProps {
   lang: string;
 }
 
-/**
- * DemoFrame — illustrative two-up of the product surface.
- *
- * Left column is the customer booking UI (business header, slot grid,
- * contact form). Right column is the owner live queue. The component
- * is static and hardcoded; it is a marketing illustration, not a
- * wired view of the live app. Per the brief, no API calls.
- *
- * Client Component because:
- * - the live-count chip in the queue header animates an integer that
- *   ticks every few seconds (subtle, hints at "real-time");
- * - the selected slot state in the slot grid is interactive
- *   (clicking a slot moves the teal-bordered highlight), giving the
- *   reader something to play with while they read the section.
- */
 export function DemoFrame({ lang }: DemoFrameProps) {
   const isEn = lang === 'en';
   const reduceMotion = useReducedMotion();
 
-  // Slots shown in the customer-side grid. One is selected, two are
-  // marked full, the rest are available. Times are PH-local 12h format.
   const slotTimes = [
     { time: '8:00 AM', state: 'available' as const },
     { time: '8:15 AM', state: 'full' as const },
@@ -50,14 +33,9 @@ export function DemoFrame({ lang }: DemoFrameProps) {
     { time: '10:00 AM', state: 'available' as const },
   ];
 
-  // Selected slot is the brief's "one marked selected" requirement.
   const [selectedTime, setSelectedTime] = useState('9:00 AM');
+  const [queueCount, setQueueCount] = useState<number>(7);
 
-  // Live queue count — the chip in the queue header animates this
-  // value to suggest a websocket subscription. The user can see the
-  // count move up by 1 after a short delay, which sells the "live"
-  // framing without overpromising.
-  const [queueCount, setQueueCount] = useState(7);
   useEffect(() => {
     if (reduceMotion) return;
     const id = setTimeout(() => setQueueCount(8), 3200);
@@ -69,43 +47,24 @@ export function DemoFrame({ lang }: DemoFrameProps) {
       aria-labelledby="demo-title"
       className="relative mx-auto w-full max-w-6xl px-6 sm:px-8"
     >
-      {/* Frame wrapper — faux browser chrome. The card sits on the
-          dark atmosphere; the inner cards use white/[0.03] so the
-          grid + glows bleed through. The shadow lifts the demo off
-          the page without crossing into "decorative glassmorphism" —
-          the shadows here are functional (lift), not atmosphere. */}
       <motion.div
         initial={{ opacity: 0, y: reduceMotion ? 0 : 28 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-80px' }}
         transition={{ duration: reduceMotion ? 0 : 0.7, ease: [0.22, 1, 0.36, 1] }}
-        className="
-          overflow-hidden rounded-2xl border border-white/10
-          bg-white/[0.03] shadow-[0_30px_80px_-30px_rgba(0,0,0,0.6)]
-        "
+        className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] shadow-[0_30px_80px_-30px_rgba(0,0,0,0.6)]"
       >
         {/* Browser chrome — a hairline traffic-light row + URL bar.
             Visually it reads as "this is a screenshot of the app",
             which is the entire point of a marketing demo. */}
-        <div
-          className="
-            flex items-center gap-3 border-b border-white/[0.06]
-            bg-white/[0.02] px-4 py-3
-          "
-        >
+        <div className="flex items-center gap-3 border-b border-white/[0.06] bg-white/[0.02] px-4 py-3">
           <div className="flex items-center gap-1.5" aria-hidden="true">
             <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
             <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
             <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
           </div>
 
-          <div
-            className="
-              mx-auto flex h-7 w-full max-w-md items-center gap-2
-              rounded-md border border-white/[0.06] bg-white/[0.02]
-              px-3
-            "
-          >
+          <div className="mx-auto flex h-7 w-full max-w-md items-center gap-2 rounded-md border border-white/[0.06] bg-white/[0.02] px-3">
             <Lock className="size-3 text-white/30" aria-hidden="true" />
             <span className="truncate font-mono text-[11px] text-white/55">
               takda.app/b/josefs-barbershop
@@ -163,45 +122,26 @@ function CustomerPanel({
           as the live component, transposed onto the dark surface. */}
       <header className="flex flex-col items-center text-center">
         <div
-          className="
-            flex h-14 w-14 items-center justify-center rounded-xl
-            border border-white/10 bg-white/[0.05]
-            font-[family-name:var(--font-display)] text-base font-extrabold
-            text-[#5DCAA5]
-          "
+          className="flex h-14 w-14 items-center justify-center rounded-xl border border-white/10 bg-white/[0.05] font-[family-name:var(--font-display)] text-base font-extrabold text-[#5DCAA5]"
           aria-hidden="true"
         >
           JB
         </div>
         <h3
           id="demo-title"
-          className="
-            mt-3 font-[family-name:var(--font-display)] text-lg
-            font-bold text-[#e8f5ef]
-          "
+          className="mt-3 font-[family-name:var(--font-display)] text-lg font-bold text-[#e8f5ef]"
         >
           {isEn ? "Josef's Barbershop" : "Barbershop ni Josef"}
         </h3>
         <div className="mt-2 flex items-center gap-1.5">
-          <span
-            className="
-              inline-flex items-center gap-1.5 rounded-full
-              border border-[#1D9E75]/40 bg-[#1D9E75]/15 px-2 py-0.5
-              text-[10px] font-semibold text-[#5DCAA5]
-            "
-          >
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-[#1D9E75]/40 bg-[#1D9E75]/15 px-2 py-0.5 text-[10px] font-semibold text-[#5DCAA5]">
             <span
               aria-hidden="true"
               className="h-1.5 w-1.5 rounded-full bg-[#1D9E75] shadow-[0_0_8px_1px_rgba(29,158,117,0.6)]"
             />
             {isEn ? 'Open today' : 'Bukás ngayon'}
           </span>
-          <span
-            className="
-              rounded-full border border-white/10 bg-white/[0.04]
-              px-2 py-0.5 text-[10px] font-semibold text-white/65
-            "
-          >
+          <span className="rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-[10px] font-semibold text-white/65">
             {isEn ? 'Gupit · 30 min' : 'Gupit · 30 min'}
           </span>
         </div>
@@ -210,12 +150,7 @@ function CustomerPanel({
       {/* Slot grid */}
       <div>
         <div className="mb-2.5 flex items-center justify-between">
-          <p
-            className="
-              inline-flex items-center gap-1.5 text-[10px] font-semibold
-              uppercase tracking-[0.14em] text-white/55
-            "
-          >
+          <p className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/55">
             <Clock className="size-3 text-[#5DCAA5]" aria-hidden="true" />
             {isEn ? 'Available times' : 'Mga oras'}
           </p>
@@ -233,12 +168,7 @@ function CustomerPanel({
                 <span
                   key={slot.time}
                   aria-disabled="true"
-                  className="
-                    flex h-8 items-center justify-center rounded-md
-                    border border-white/[0.04] bg-white/[0.015]
-                    font-mono text-[11px] font-medium text-white/25
-                    line-through
-                  "
+                  className="flex h-8 items-center justify-center rounded-md border border-white/[0.04] bg-white/[0.015] font-mono text-[11px] font-medium text-white/25 line-through"
                 >
                   {slot.time}
                 </span>
@@ -251,15 +181,11 @@ function CustomerPanel({
                 type="button"
                 onClick={() => onSelect(slot.time)}
                 aria-pressed={isSelected}
-                className={`
-                  flex h-8 items-center justify-center rounded-md
-                  font-mono text-[11px] font-semibold transition-all
-                  ${
-                    isSelected
-                      ? 'border border-[#5DCAA5] bg-[#1D9E75] text-white shadow-[0_4px_18px_-6px_rgba(29,158,117,0.7)]'
-                      : 'border border-white/[0.08] bg-white/[0.03] text-[#e8f5ef] hover:border-white/20'
-                  }
-                `}
+                className={`flex h-8 items-center justify-center rounded-md font-mono text-[11px] font-semibold transition-all ${
+                  isSelected
+                    ? 'border border-[#5DCAA5] bg-[#1D9E75] text-white shadow-[0_4px_18px_-6px_rgba(29,158,117,0.7)]'
+                    : 'border border-white/[0.08] bg-white/[0.03] text-[#e8f5ef] hover:border-white/20'
+                }`}
               >
                 {slot.time}
               </button>
@@ -279,14 +205,7 @@ function CustomerPanel({
         />
         <button
           type="button"
-          className="
-            mt-1 inline-flex h-10 w-full items-center justify-center gap-2
-            rounded-lg bg-[#1D9E75] text-sm font-semibold text-white
-            transition-colors hover:bg-[#5DCAA5] hover:text-[#0a1f1a]
-            focus-visible:outline-none focus-visible:ring-2
-            focus-visible:ring-[#5DCAA5] focus-visible:ring-offset-2
-            focus-visible:ring-offset-[#0a1f1a]
-          "
+          className="mt-1 inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-[#1D9E75] text-sm font-semibold text-white transition-colors hover:bg-[#5DCAA5] hover:text-[#0a1f1a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5DCAA5] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1f1a]"
         >
           <span>{isEn ? 'Reserve 9:00 AM' : 'I-reserve ang 9:00 AM'}</span>
           <ArrowRight className="size-3.5" aria-hidden="true" />
@@ -298,12 +217,7 @@ function CustomerPanel({
 
 function FormField({ icon, value }: { icon: React.ReactNode; value: string }) {
   return (
-    <div
-      className="
-        flex h-10 items-center gap-2 rounded-lg border border-white/[0.08]
-        bg-white/[0.025] px-3
-      "
-    >
+    <div className="flex h-10 items-center gap-2 rounded-lg border border-white/[0.08] bg-white/[0.025] px-3">
       <span className="text-white/45" aria-hidden="true">
         {icon}
       </span>
@@ -370,10 +284,7 @@ function OwnerQueuePanel({ isEn, liveCount }: { isEn: boolean; liveCount: number
         </p>
         <button
           type="button"
-          className="
-            inline-flex items-center gap-1 text-[10px] font-semibold
-            text-[#5DCAA5] transition-colors hover:text-white
-          "
+          className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#5DCAA5] transition-colors hover:text-white"
         >
           {isEn ? 'Open full queue' : 'Buksan ang buong pila'}
           <ChevronRight className="size-3" aria-hidden="true" />
@@ -417,11 +328,7 @@ function QueueRow({
     <li className="flex items-center gap-3 px-3 py-2.5">
       <span
         aria-hidden="true"
-        className="
-          flex h-5 w-5 shrink-0 items-center justify-center
-          rounded-full bg-white/[0.04] font-mono text-[10px] font-bold
-          text-white/70
-        "
+        className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white/[0.04] font-mono text-[10px] font-bold text-white/70"
       >
         {position}
       </span>
@@ -432,11 +339,7 @@ function QueueRow({
         {time}
       </span>
       <span
-        className={`
-          inline-flex shrink-0 items-center gap-1 rounded-full border
-          px-1.5 py-0.5 text-[9px] font-semibold uppercase
-          tracking-[0.06em] ${s.cls}
-        `}
+        className={`inline-flex shrink-0 items-center gap-1 rounded-full border px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.06em] ${s.cls}`}
       >
         {status === 'checked_in' ? (
           <CheckCircle2 className="size-2.5" aria-hidden="true" />

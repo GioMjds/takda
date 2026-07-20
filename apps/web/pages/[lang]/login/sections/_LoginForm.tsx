@@ -64,15 +64,14 @@ export function LoginForm({ lang, dict }: LoginFormProps) {
       onSubmit={onSubmit}
       noValidate
       aria-busy={isSubmitting}
-      className="w-full space-y-7"
+      suppressHydrationWarning
+      className="w-full space-y-6"
     >
-      {/* Heading + subhead — the form's only narrative copy. Lives
-          inside the form so a screen reader user hears "Welcome back,
-          form, heading level 2" instead of an ungrouped visual. */}
+      {/* Heading + subhead — narrative copy inside form for screen readers. */}
       <header className="space-y-1.5">
         <h2
           className="
-            text-[17px] font-medium leading-tight tracking-[-0.01em]
+            text-[18px] font-semibold leading-snug tracking-[-0.015em]
             text-[#e8f5ef]
           "
         >
@@ -80,15 +79,15 @@ export function LoginForm({ lang, dict }: LoginFormProps) {
         </h2>
         <p
           className="
-            text-[12.5px] font-light leading-relaxed
-            text-[#e8f5ef]/55
+            text-[13px] font-normal leading-relaxed
+            text-[#e8f5ef]/65
           "
         >
           {dict.subheading}
         </p>
       </header>
 
-      <div className="space-y-3.5">
+      <div className="space-y-4">
         {/* Email field */}
         <Field
           id="email"
@@ -118,14 +117,14 @@ export function LoginForm({ lang, dict }: LoginFormProps) {
       </div>
 
       {/* Submit + inline error */}
-      <div className="space-y-2.5">
+      <div className="space-y-3">
         <button
           type="submit"
           disabled={isSubmitting}
           className="
-            group/btn relative inline-flex h-10 w-full items-center
-            justify-center gap-2 rounded-[7px] bg-[#1D9E75]
-            px-4 text-[13.5px] font-medium text-[#0a1510]
+            group/btn relative inline-flex h-11 w-full items-center
+            justify-center gap-2 rounded-[8px] bg-[#1D9E75]
+            px-4 text-[14px] font-semibold text-[#0a1510]
             transition-colors
             hover:bg-[#5DCAA5] hover:text-[#0a1f1a]
             focus-visible:outline-none focus-visible:ring-2
@@ -138,7 +137,7 @@ export function LoginForm({ lang, dict }: LoginFormProps) {
           {isSubmitting ? (
             <>
               <Loader2Icon
-                className="size-3.5 animate-spin"
+                className="size-4 animate-spin"
                 aria-hidden="true"
               />
               <span>Signing in…</span>
@@ -148,17 +147,14 @@ export function LoginForm({ lang, dict }: LoginFormProps) {
           )}
         </button>
 
-        {/* Inline API error. Renders only when `apiError` is non-null,
-            which happens for 401 (wrong creds) and any unexpected
-            throw. The hook distinguishes between invalid-creds and
-            network errors via the BFF's response shape. */}
+        {/* Inline API error */}
         {apiError && (
           <p
             id="login-error"
             role="alert"
             className="
               animate-in fade-in slide-in-from-top-1 duration-200
-              pt-1 text-[12px] font-normal leading-snug
+              pt-0.5 text-[12.5px] font-medium leading-snug
               text-red-400
             "
           >
@@ -167,13 +163,11 @@ export function LoginForm({ lang, dict }: LoginFormProps) {
         )}
       </div>
 
-      {/* Footer — owner accounts are provisioned by an admin, not
-          self-serve. We acknowledge that quietly instead of offering
-          a sign-up link that leads nowhere. */}
+      {/* Footer message */}
       <p
         className="
-          pt-1 text-[11px] font-light leading-relaxed
-          text-[#e8f5ef]/40
+          pt-1 text-[12px] font-normal leading-relaxed
+          text-[#e8f5ef]/50
         "
       >
         {dict.footer}
@@ -183,9 +177,8 @@ export function LoginForm({ lang, dict }: LoginFormProps) {
 }
 
 /**
- * Field — a single labelled input that matches the spec's exact
- * per-field padding, border, and text color. Hand-rolled instead of
- * using shadcn's `Input` so we don't fight its base styles.
+ * Field — a single labelled input with explicit sizing (44px height for mobile touch targets),
+ * crisp contrast under sunlight, and clear focus states.
  */
 function Field({
   id,
@@ -209,8 +202,8 @@ function Field({
       <label
         htmlFor={id}
         className="
-          block text-[11px] font-normal leading-none tracking-wide
-          text-[#e8f5ef]/50
+          block text-[12px] font-medium leading-none tracking-wide
+          text-[#e8f5ef]/70
         "
       >
         {label}
@@ -223,24 +216,23 @@ function Field({
           autoComplete={autoComplete}
           placeholder={placeholder}
           disabled={disabled}
-          // The pad-right leaves room for the endAdornment (password
-          // toggle) so the typed value never runs under the icon.
+          suppressHydrationWarning
           className={`
-            block h-10 w-full rounded-[7px] border border-white/[0.12]
-            bg-white/[0.05] px-3 text-[13px] font-light
-            text-[rgba(232,245,239,0.7)]
-            placeholder:text-[rgba(232,245,239,0.30)]
+            block h-11 w-full rounded-[8px] border border-white/[0.14]
+            bg-white/[0.05] px-3.5 text-[14px] font-normal
+            text-[#e8f5ef]
+            placeholder:text-[#e8f5ef]/40
             transition-colors
             outline-none ring-0
-            hover:border-white/[0.18]
-            focus:border-[#1D9E75]/60 focus:bg-[#1D9E75]/[0.06]
-            focus-visible:border-[#1D9E75]/60 focus-visible:bg-[#1D9E75]/[0.06]
+            hover:border-white/[0.22]
+            focus:border-[#1D9E75] focus:bg-[#1D9E75]/[0.08]
+            focus-visible:border-[#1D9E75] focus-visible:bg-[#1D9E75]/[0.08]
             disabled:cursor-not-allowed disabled:opacity-60
-            ${endAdornment ? 'pr-11' : ''}
+            ${endAdornment ? 'pr-12' : ''}
           `}
         />
         {endAdornment && (
-          <div className="absolute inset-y-0 right-0 flex items-center pr-2">
+          <div className="absolute inset-y-0 right-0 flex items-center pr-1.5">
             {endAdornment}
           </div>
         )}
@@ -250,12 +242,8 @@ function Field({
 }
 
 /**
- * PasswordToggle — eye / eye-off glyph that flips the password field's
- * type. The visible icon is 16px, but the click target expands via the
- * button's padding so the hit area is at least 32×32 (a touch above
- * the 48px mobile target — accepted because the input itself is
- * the primary touch target on mobile and users will usually tap the
- * field, not the icon).
+ * PasswordToggle — eye / eye-off glyph with an expanded hit area (36×36px)
+ * for reliable mobile interaction.
  */
 function PasswordToggle({
   shown,
@@ -274,11 +262,11 @@ function PasswordToggle({
       aria-label={shown ? 'Hide password' : 'Show password'}
       aria-pressed={shown}
       className="
-        inline-flex h-7 w-7 items-center justify-center rounded-md
-        text-[rgba(232,245,239,0.45)] transition-colors
-        hover:bg-white/[0.05] hover:text-[rgba(232,245,239,0.85)]
+        inline-flex h-9 w-9 items-center justify-center rounded-md
+        text-[#e8f5ef]/60 transition-colors
+        hover:bg-white/[0.08] hover:text-[#e8f5ef]
         focus-visible:outline-none focus-visible:ring-2
-        focus-visible:ring-[#1D9E75]/60
+        focus-visible:ring-[#1D9E75]
         disabled:cursor-not-allowed disabled:opacity-50
       "
     >

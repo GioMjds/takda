@@ -22,7 +22,7 @@ export async function LoginView({ lang }: LoginViewProps) {
   const dict = await getDictionary(lang as Locale);
 
   return (
-    <div className="w-full">
+    <div className="w-full" suppressHydrationWarning>
       <LoginForm
         lang={lang}
         dict={{

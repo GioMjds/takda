@@ -10,6 +10,10 @@ import {
 } from '@node-idempotency/nestjs';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthModule } from './auth/auth.module';
+import { PrismaModule } from './prisma/prisma.module';
+import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
+import { RolesGuard } from './common/guards/roles.guard';
 
 @Module({
   imports: [
@@ -49,6 +53,8 @@ import { AppService } from './app.service';
         ),
       }),
     }),
+    PrismaModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [
@@ -56,6 +62,14 @@ import { AppService } from './app.service';
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
     },
   ],
 })

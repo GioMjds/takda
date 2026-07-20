@@ -61,7 +61,7 @@ apps/web/
 ├── stores/                   # zustand stores (one per feature)
 ├── public/
 ├── next.config.ts
-├── tailwind.config.* (or v4 css-first config)
+│   └── app/globals.css       # Tailwind 4 CSS-first config (@import 'tailwindcss')
 └── tsconfig.json             # extends ../../tsconfig.json
 ```
 
@@ -209,19 +209,41 @@ without polluting the URL.
 
 ---
 
-## 8. Styling
+## 8. Styling (Tailwind CSS v4 Rules & Warning Prevention)
 
-- Tailwind 4, utility-first. No `@apply` for layout — keep classes
-  on the element so it's obvious at a glance.
-- shadcn/ui primitives live in `components/ui/`. Don't hand-roll
-  buttons / dialogs / dropdowns that shadcn already provides.
-- Color tokens come from the Takda design palette (see
-  `globals.css`). If a new color is needed, add a token, don't use a
-  raw hex.
-- Money is always rendered with `Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' })`. Use `lib/format.ts`; never `₱{x}` in JSX.
-- Dates/times are in the Asia/Manila timezone. Render with
-  `Intl.DateTimeFormat('en-PH', { timeZone: 'Asia/Manila', ... })`
-  in `lib/format.ts`. **Never** call `new Date().toLocaleString()` inline.
+- **CSS-First Engine & Config**:
+  - Tailwind v4 uses CSS-first configuration via `@import 'tailwindcss';` in `app/globals.css`.
+  - **Do NOT create or use legacy `tailwind.config.js` / `tailwind.config.ts`**. Custom theme tokens, font families, keyframes, and radii must be registered using `@theme inline` or `@theme` blocks inside `app/globals.css`.
+  - Use `@variant dark (&:where(.dark, .dark *));` or standard media query variants for dark mode. **Do NOT use deprecated `@custom-variant` directives**, as they produce build-time compiler warnings in `@tailwindcss/postcss`.
+
+- **Preventing Un-Updated Styles & Build Warnings**:
+  - **No Dynamic String Interpolation for Class Names**: Tailwind v4 uses a static scanner to detect class names at build time. Never construct class names dynamically using template literals or string concatenation (e.g., `` className={`bg-${color}-500`} `` or `` text-${variant} ``). Dynamically generated classes cannot be detected by the scanner, causing styles to fail to compile or update. Always use complete literal strings or exhaustive lookup objects:
+    ```typescript
+    // BAD (Tailwind scanner misses these, styles won't update):
+    const badgeColor = `bg-${variant}-100 text-${variant}-800`;
+
+    // GOOD (Static literals recognized by Tailwind scanner):
+    const variantStyles = {
+      success: 'bg-emerald-100 text-emerald-800',
+      warning: 'bg-amber-100 text-amber-800',
+    };
+    ```
+  - **Avoid Deprecated `@apply` Directives**: Do not use `@apply` for layout classes or inside `@layer base`. Complex `@apply` declarations (especially modifier utility combinations like `@apply outline-ring/50;`) generate PostCSS compiler warnings and silent failures in v4. Use utility classes directly on elements or standard CSS declarations in `globals.css` (e.g. `border-color: var(--border);`).
+  - **Scanning Shared Workspaces (`@source`)**: When referencing utility classes or components located in external workspace packages (e.g. `@takda/shared`), explicitly add `@source` directives in `globals.css` so the v4 compiler extracts all utility classes:
+    ```css
+    @source "../../packages/shared";
+    ```
+  - **PostCSS Setup**: `postcss.config.mjs` must use `@tailwindcss/postcss` exclusively (do not mix legacy `tailwindcss` PostCSS plugin configs).
+
+- **Design Tokens & Theme Variables**:
+  - Color tokens come from the Takda design palette in `app/globals.css` defined using OKLCH color spaces.
+  - Custom theme variables in `:root` and `.dark` must be registered in `@theme inline` (`--color-primary: var(--primary);`, etc.). Never hardcode raw hex values directly in component files.
+  - All surface and text contrast ratios must maintain $\ge 4.5:1$ for outdoor sunlight legibility.
+
+- **Primitives & Formatting Guidelines**:
+  - **shadcn/ui primitives**: Live in `components/ui/`. Don't hand-roll custom buttons, dialogs, or dropdowns when shadcn primitives exist.
+  - **Currency formatting**: Money must always be rendered with `Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' })` via `lib/format.ts`. Never hardcode `₱{x}` in JSX.
+  - **Date & Time formatting**: Always format dates in `Asia/Manila` timezone using `lib/format.ts`. **Never** call `new Date().toLocaleString()` inline.
 
 ---
 
@@ -265,6 +287,7 @@ without polluting the URL.
   across the monorepo.
 - Don't `dangerouslySetInnerHTML` for customer-facing strings. The
   PWA must be safe in any context a QR code can put it in.
+- Don't add verbose or unnecessary inline code comments when updating files — keep code clean, self-documenting, and comments minimal.
 
 ---
 

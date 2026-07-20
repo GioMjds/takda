@@ -25,10 +25,6 @@ export default function CustomerBookingView({
   lang = 'tl',
   dict,
 }: Partial<CustomerBookingViewProps>) {
-  if (!business || !dict) {
-    return null;
-  }
-
   // Service selection state (default to first active service if any)
   const [selectedServiceId, setSelectedServiceId] = useState(() => {
     const active = services.find((s) => s.isActive);
@@ -36,8 +32,6 @@ export default function CustomerBookingView({
   });
 
   // Filter slots for the selected service
-  // Note: For v1, the slots might be shared or per-service. We filter slots if needed.
-  // We expect slots in props to be relevant for today.
   const [selectedSlotStart, setSelectedSlotStart] = useState('');
 
   // Form logic hook
@@ -49,6 +43,10 @@ export default function CustomerBookingView({
     onSubmit,
     resetForm,
   } = useBookingForm(selectedServiceId, selectedSlotStart);
+
+  if (!business || !dict) {
+    return null;
+  }
 
   const handleServiceSelect = (id: string) => {
     setSelectedServiceId(id);

@@ -43,13 +43,13 @@ export function proxy(req: NextRequest) {
     const rest = bMatch[2] || '';
     const locale = getLocale(req);
     return NextResponse.redirect(
-      new URL(`/${locale}/b/${businessSlug}${rest}${search}` as Route, req.url)
+      new URL(`/${locale}/b/${businessSlug}${rest}${search}` as Route, req.url),
     );
   }
 
   // 4. Check if pathname has a supported locale prefix
   const pathnameHasLocale = LOCALES.some(
-    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
+    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`,
   );
 
   // If the pathname has no locale segment or an invalid locale segment,
@@ -65,12 +65,14 @@ export function proxy(req: NextRequest) {
       // Replace the invalid locale segment with the valid one
       pathSegments[1] = locale;
       const redirectPath = pathSegments.join('/');
-      return NextResponse.redirect(new URL(`${redirectPath}${search}` as Route, req.url));
+      return NextResponse.redirect(
+        new URL(`${redirectPath}${search}` as Route, req.url),
+      );
     } else {
       // If it's a completely un-prefixed URL, add the locale prefix
       const locale = getLocale(req);
       return NextResponse.redirect(
-        new URL(`/${locale}${pathname}${search}` as Route, req.url)
+        new URL(`/${locale}${pathname}${search}` as Route, req.url),
       );
     }
   }
@@ -78,20 +80,28 @@ export function proxy(req: NextRequest) {
   // 5. Auth Guard: Guard the dashboard
   const token = req.cookies.get('access_token')?.value;
   const isDashboardRoute = LOCALES.some((locale) =>
-    pathname.startsWith(`/${locale}/dashboard`)
+    pathname.startsWith(`/${locale}/dashboard`),
   );
-  const isLoginRoute = LOCALES.some((locale) =>
-    pathname === `/${locale}/login` || pathname.startsWith(`/${locale}/login/`)
+  const isLoginRoute = LOCALES.some(
+    (locale) =>
+      pathname === `/${locale}/login` ||
+      pathname.startsWith(`/${locale}/login/`),
   );
 
   if (isDashboardRoute && !token) {
-    const locale = LOCALES.find((l) => pathname.startsWith(`/${l}/`)) || DEFAULT_LOCALE;
-    return NextResponse.redirect(new URL(`/${locale}/login${search}` as Route, req.url));
+    const locale =
+      LOCALES.find((l) => pathname.startsWith(`/${l}/`)) || DEFAULT_LOCALE;
+    return NextResponse.redirect(
+      new URL(`/${locale}/login${search}` as Route, req.url),
+    );
   }
 
   if (isLoginRoute && token) {
-    const locale = LOCALES.find((l) => pathname.startsWith(`/${l}/`)) || DEFAULT_LOCALE;
-    return NextResponse.redirect(new URL(`/${locale}/dashboard${search}` as Route, req.url));
+    const locale =
+      LOCALES.find((l) => pathname.startsWith(`/${l}/`)) || DEFAULT_LOCALE;
+    return NextResponse.redirect(
+      new URL(`/${locale}/dashboard${search}` as Route, req.url),
+    );
   }
 
   return NextResponse.next();

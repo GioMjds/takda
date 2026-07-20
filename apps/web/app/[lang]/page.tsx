@@ -10,36 +10,15 @@ export default async function HomePage({ params }: PageProps<'/[lang]'>) {
   const { lang } = await params;
 
   return (
-    <div
-      className="
-        relative isolate min-h-screen w-full overflow-hidden
-        bg-[#0a1f1a] text-[#e8f5ef]
-        font-sans
-      "
-    >
-      {/* Subtle grid overlay — gives the page a structural, technical
-          feel without committing to a terminal aesthetic. Lower alpha
-          on smaller viewports to avoid moiré on phone screens. */}
+    <div className="relative isolate min-h-screen w-full overflow-hidden bg-[#0a1f1a] text-[#e8f5ef] font-sans">
       <div
         aria-hidden="true"
-        className="
-          pointer-events-none absolute inset-0 z-0
-          bg-[linear-gradient(to_right,rgba(168,221,212,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(168,221,212,0.06)_1px,transparent_1px)]
-          bg-size-[64px_64px]
-          mask-[radial-gradient(ellipse_80%_60%_at_50%_30%,#000_55%,transparent_100%)]
-        "
+        className="pointer-events-none absolute inset-0 z-0 bg-[linear-gradient(to_right,rgba(168,221,212,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(168,221,212,0.06)_1px,transparent_1px)] bg-size-[64px_64px] mask-[radial-gradient(ellipse_80%_60%_at_50%_30%,#000_55%,transparent_100%)]"
       />
 
-      {/* Teal radial glow — top-left. Anchors the brand color where the
-          eye lands first and gives the H1 a warm-cool contrast. */}
       <div
         aria-hidden="true"
-        className="
-          pointer-events-none absolute -top-40 -left-40 z-0
-          h-160 w-160 rounded-full
-          bg-[radial-gradient(circle,rgba(29,158,117,0.35)_0%,rgba(29,158,117,0.08)_45%,transparent_72%)]
-          blur-3xl
-        "
+        className="pointer-events-none absolute -top-40 -left-40 z-0 h-160 w-160 rounded-full bg-[radial-gradient(circle,rgba(29,158,117,0.35)_0%,rgba(29,158,117,0.08)_45%,transparent_72%)] blur-3xl"
       />
 
       {/* Amber radial glow — bottom-right. Counterweight to the teal
@@ -47,12 +26,7 @@ export default async function HomePage({ params }: PageProps<'/[lang]'>) {
           low alpha so the grid remains readable through them. */}
       <div
         aria-hidden="true"
-        className="
-          pointer-events-none absolute -bottom-48 -right-32 z-0
-          h-140 w-140 rounded-full
-          bg-[radial-gradient(circle,rgba(217,158,73,0.22)_0%,rgba(217,158,73,0.06)_45%,transparent_72%)]
-          blur-3xl
-        "
+        className="pointer-events-none absolute -bottom-48 -right-32 z-0 h-140 w-140 rounded-full bg-[radial-gradient(circle,rgba(217,158,73,0.22)_0%,rgba(217,158,73,0.06)_45%,transparent_72%)] blur-3xl"
       />
 
       <div

@@ -10,7 +10,7 @@
     "target": "esnext",
     "sourceMap": true,
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": "../../",
     "incremental": true,
     "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
     "strictNullChecks": true,
@@ -19,7 +19,8 @@
       "@takda/shared": ["../../packages/shared/src/index.ts"],
       "@takda/shared/*": ["../../packages/shared/src/*"],
       "./*": ["./src/*"]
-    }
+    },
+    "types": ["jest", "node"]
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "src/generated"]

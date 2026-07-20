@@ -1,46 +1,44 @@
-'use client';
-
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { FileQuestion, Home } from 'lucide-react';
 import type { Route } from 'next';
 
-export default function BusinessNotFound() {
-  const pathname = usePathname();
-  
-  // Detect locale from pathname (e.g., /en/b/something -> en)
-  const isTagalog = pathname ? pathname.startsWith('/tl') : true;
-  const homePath = (isTagalog ? '/tl' : '/en') as Route;
-
+/**
+ * 404 for the customer booking route.
+ *
+ * The customer just scanned a QR code that no longer resolves. The
+ * mistake is almost always on the operator's side (re-printed sticker,
+ * renamed business) rather than the customer's, so the page stays
+ * calm rather than alarming. The 404 is a faint teal serif rather
+ * than a vibrant accent — it's information, not a button.
+ */
+export default async function BusinessNotFound() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-6 space-y-6">
-      {/* Icon with clean design */}
-      <div className="w-16 h-16 rounded-2xl bg-[#e3f5f0] flex items-center justify-center border border-[#a8ddd4]/40 text-[#1a8c75] shadow-[0_4px_12px_rgba(26,140,117,0.06)] animate-bounce">
-        <FileQuestion className="size-8" />
-      </div>
+    <div className="flex min-h-[60vh] flex-col items-center justify-center pt-6 text-center">
+      {/* Large serif 404 — set in the display family at extreme size
+          but in a faint teal so it sits behind the headline rather
+          than shouting. letter-spacing tightened to the floor for a
+          confident, designed feel rather than a stock-image one. */}
+      <span
+        aria-hidden="true"
+        className="font-[family-name:var(--font-display)] text-[120px] font-semibold leading-none tracking-[-0.04em] text-[#1D9E75]/20 sm:text-[160px]"
+      >
+        404
+      </span>
 
-      {/* Localized titles & descriptions */}
-      <div className="space-y-2 max-w-sm">
-        <h1 className="text-2xl font-extrabold text-[#0d4f43] tracking-tight font-display">
-          {isTagalog ? 'Negosyo Hindi Nahanap' : 'Business Not Found'}
-        </h1>
-        <p className="text-sm text-[#0d4f43]/70 font-medium leading-relaxed">
-          {isTagalog
-            ? 'Hindi nahanap ang negosyong ito. Pakisuri ang link o i-scan muli ang QR code sa tindahan.'
-            : 'We could not find this business page. Please check the URL or scan the storefront QR code again.'}
-        </p>
-      </div>
+      <h1 className="-mt-3 font-[family-name:var(--font-display)] text-[22px] font-medium tracking-[-0.02em] text-[#e8f5ef] sm:text-2xl">
+        This business wasn&apos;t found.
+      </h1>
 
-      {/* Navigation CTA button */}
-      <div className="pt-2 w-full max-w-xs">
-        <Link
-          href={homePath}
-          className="w-full flex items-center justify-center gap-2 py-3 px-4 border border-transparent rounded-lg text-sm font-bold text-[#f7fafa] bg-[#1a8c75] hover:bg-[#0d4f43] focus:outline-none focus:ring-2 focus:ring-[#a8ddd4] transition duration-200 text-center min-h-12 shadow-[0_4px_12px_rgba(26,140,117,0.08)]"
-        >
-          <Home className="size-4" />
-          {isTagalog ? 'Bumalik sa Simula' : 'Go back to Home'}
-        </Link>
-      </div>
+      <p className="mt-3 max-w-[280px] text-[13px] font-light leading-relaxed text-[#e8f5ef]/55">
+        The QR code or link may be outdated. Try scanning again at the
+        storefront.
+      </p>
+
+      <Link
+        href={'/' as Route}
+        className="mt-8 inline-flex h-11 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] px-5 text-[13px] font-semibold text-[#e8f5ef]/85 backdrop-blur-sm transition-all hover:border-white/20 hover:bg-white/[0.08] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D9E75]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1a15]"
+      >
+        Back to home
+      </Link>
     </div>
   );
 }

@@ -4,16 +4,6 @@ export interface FeaturesSectionProps {
   lang: string;
 }
 
-/**
- * Three-feature grid. Server Component — fully static.
- *
- * Per the layout-register, "identical card grids" is the AI tell when
- * every section is one. This page only has one card grid (this one),
- * so the warning does not apply. To keep the cards from feeling like
- * a SaaS template, the title sits on a hairline divider inside the
- * card body — the rule replaces what would otherwise be the repeated
- * "icon-then-text-then-text" rhythm.
- */
 export function FeaturesSection({ lang }: FeaturesSectionProps) {
   const isEn = lang === 'en';
 
@@ -34,7 +24,9 @@ export function FeaturesSection({ lang }: FeaturesSectionProps) {
     },
     {
       icon: LayoutList,
-      title: isEn ? 'Live queue behind the counter' : 'Live na pila sa likod ng counter',
+      title: isEn
+        ? 'Live queue behind the counter'
+        : 'Live na pila sa likod ng counter',
       body: isEn
         ? 'One screen, in order. Mark arrivals, add walk-ins, and reshuffle without losing your place. Everything updates the moment it happens.'
         : 'Isang screen, naka-ayos. I-mark ang dating, magdagdag ng walk-in, at mag-reshuffle nang hindi nawawala. Lahat updated agad.',
@@ -50,16 +42,13 @@ export function FeaturesSection({ lang }: FeaturesSectionProps) {
       <div className="mb-12 max-w-2xl sm:mb-14">
         <h2
           id="features-title"
-          className="
-            font-[family-name:var(--font-display)] text-[clamp(1.75rem,3.4vw,2.5rem)]
-            font-extrabold leading-[1.1] tracking-[-0.02em] text-[#e8f5ef]
-            text-balance
-          "
+          className="font-[family-name:var(--font-display)] text-[clamp(1.75rem,3.4vw,2.5rem)] font-extrabold leading-[1.1] tracking-[-0.02em] text-[#e8f5ef] text-balance"
         >
           {isEn ? (
             <>
               Built for the way{' '}
-              <span className="text-[#5DCAA5]">your counter</span> actually runs.
+              <span className="text-[#5DCAA5]">your counter</span> actually
+              runs.
             </>
           ) : (
             <>
@@ -79,21 +68,12 @@ export function FeaturesSection({ lang }: FeaturesSectionProps) {
         {features.map((feature) => (
           <li
             key={feature.title}
-            className="
-              group rounded-xl border border-white/[0.08] bg-white/[0.03]
-              p-5 transition-colors
-              hover:border-white/[0.15] hover:bg-white/[0.05]
-            "
+            className="group rounded-xl border border-white/[0.08] bg-white/[0.03] p-5 transition-colors hover:border-white/[0.15] hover:bg-white/[0.05]"
           >
             <div className="mb-4 flex items-center gap-3">
               <span
                 aria-hidden="true"
-                className="
-                  flex h-[34px] w-[34px] items-center justify-center
-                  rounded-lg border border-[#1D9E75]/25 bg-[#1D9E75]/[0.14]
-                  text-[#5DCAA5] transition-colors
-                  group-hover:border-[#1D9E75]/50 group-hover:text-white
-                "
+                className="flex h-[34px] w-[34px] items-center justify-center rounded-lg border border-[#1D9E75]/25 bg-[#1D9E75]/[0.14] text-[#5DCAA5] transition-colors group-hover:border-[#1D9E75]/50 group-hover:text-white"
               >
                 <feature.icon className="size-4" />
               </span>
@@ -102,12 +82,7 @@ export function FeaturesSection({ lang }: FeaturesSectionProps) {
             {/* The hairline divider under the title is the one piece of
                 visual rhythm. Without it the three cards read as
                 "icon + heading + body" in identical cadence. */}
-            <h3
-              className="
-                pb-2.5 text-[13px] font-medium text-[#e8f5ef]
-                border-b border-white/[0.06]
-              "
-            >
+            <h3 className="pb-2.5 text-[13px] font-medium text-[#e8f5ef] border-b border-white/[0.06]">
               {feature.title}
             </h3>
             <p className="mt-2.5 text-[11.5px] font-light leading-relaxed text-[#e8f5ef]/55">

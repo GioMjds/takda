@@ -9,40 +9,16 @@ export default async function AuthLayout({
   const isEn = lang === 'en';
 
   return (
-    <div
-      className={`
-        relative isolate flex min-h-screen w-full overflow-hidden
-        bg-[#0a1f1a] text-[#e8f5ef] font-sans
-      `}
-    >
-      {/* Subtle grid overlay — keeps the scene technical/structural
-          without committing to terminal aesthetic. The radial mask
-          keeps it from feeling like graph paper at the edges. */}
+    <div className="relative isolate flex min-h-screen w-full overflow-hidden bg-[#0a1f1a] text-[#e8f5ef] font-sans">
+      {/* Luminous teal radial glow — anchored to the left edge, vertically
+          centered. Gives the left panel a natural anchor point without
+          over-decorating or bleeding onto the right panel. */}
       <div
         aria-hidden="true"
-        className="
-          pointer-events-none absolute inset-0 z-0
-          bg-[linear-gradient(to_right,rgba(168,221,212,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(168,221,212,0.05)_1px,transparent_1px)]
-          bg-size-[64px_64px]
-          mask-[radial-gradient(ellipse_80%_70%_at_50%_50%,#000_55%,transparent_100%)]
-        "
+        className="pointer-events-none absolute -left-40 top-1/2 z-0 h-190 -translate-y-1/2 w-[760px] rounded-full bg-[radial-gradient(circle,rgba(29,158,117,0.22)_0%,rgba(29,158,117,0.06)_45%,transparent_72%)] blur-3xl"
       />
 
-      {/* Teal radial glow — anchored to the left edge, vertically
-          centered. Gives the left panel a luminous anchor point
-          without bleeding onto the right panel's form area. */}
-      <div
-        aria-hidden="true"
-        className="
-          pointer-events-none absolute -left-40 top-1/2 z-0
-          h-190760px] -translate-y-1/2 rounded-full
-          bg-[radial-gradient(circle,rgba(29,158,117,0.30)_0%,rgba(29,158,117,0.08)_45%,transparent_72%)]
-          blur-3xl
-        "
-      />
-
-      {/* Hairline top + bottom borders — structural bookends.
-          Reinforces the technical/grid vibe without visual weight. */}
+      {/* Hairline top + bottom borders — structural subtle bookends. */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 top-0 z-10 h-px bg-white/6"
@@ -59,10 +35,7 @@ export default async function AuthLayout({
           is hidden on small screens; the right panel's wordmark carries
           the brand there. */}
       <aside
-        className="
-          relative z-10 hidden flex-1 flex-col justify-between
-          p-12 lg:flex lg:p-14 xl:p-16
-        "
+        className="relative z-10 hidden flex-1 flex-col justify-between p-12 lg:flex lg:p-14 xl:p-16"
         aria-label={isEn ? 'Brand' : 'Brand'}
       >
         {/* Wordmark — top-left. Single word, weighty, in mint-white.
@@ -73,13 +46,7 @@ export default async function AuthLayout({
           aria-label="Takda home"
           className="group inline-flex w-fit items-center gap-2.5"
         >
-          <span
-            className="
-              font-(family-name:--font-display) text-2xl
-              font-extrabold tracking-tight text-[#e8f5ef]
-              transition-colors group-hover:text-white
-            "
-          >
+          <span className="font-(family-name:--font-display) text-2xl font-extrabold tracking-tight text-[#e8f5ef] transition-colors group-hover:text-white">
             Takda
           </span>
           <span
@@ -94,14 +61,7 @@ export default async function AuthLayout({
             italic on a single beat is voice; italic on every line is
             the AI tell. */}
         <div className="max-w-md">
-          <h1
-            className="
-              font-(family-name:--font-display)
-              text-[clamp(1.875rem,2.6vw,2.25rem)]
-              font-medium leading-[1.15] tracking-[-0.02em]
-              text-[#e8f5ef] text-balance
-            "
-          >
+          <h1 className="font-(family-name:--font-display) text-[clamp(1.875rem,2.6vw,2.25rem)] font-medium leading-[1.15] tracking-[-0.02em] text-[#e8f5ef] text-balance">
             {isEn ? (
               <>
                 Manage your queue,{' '}
@@ -121,12 +81,7 @@ export default async function AuthLayout({
             )}
           </h1>
 
-          <p
-            className="
-              mt-5 max-w-sm text-[13px] font-light leading-relaxed
-              text-[#e8f5ef]/55
-            "
-          >
+          <p className="mt-5 max-w-sm text-[13px] font-light leading-relaxed text-[#e8f5ef]/55">
             {isEn
               ? 'The QR-based queue system built for walk-in businesses across the Philippines.'
               : 'QR-based queue system para sa mga walk-in na negosyo sa buong Pilipinas.'}
@@ -137,9 +92,7 @@ export default async function AuthLayout({
               label is a thin 11px sans below it. Divider is a vertical
               hairline, not a side-stripe on a card. */}
           <dl
-            className="
-              mt-12 flex items-end divide-x divide-white/8
-            "
+            className="mt-12 flex items-end divide-x divide-white/8"
             aria-label={isEn ? 'Highlights' : 'Mga highlight'}
           >
             <Stat value="200+" label={isEn ? 'businesses' : 'negosyo'} />
@@ -159,10 +112,7 @@ export default async function AuthLayout({
             the content. */}
         <span
           aria-hidden="true"
-          className="
-            font-mono text-[10px] font-light tracking-wider
-            text-[#e8f5ef]/20
-          "
+          className="font-mono text-[10px] font-light tracking-wider text-[#e8f5ef]/20"
         >
           {/* (auth)/layout.tsx */}
         </span>
@@ -171,14 +121,7 @@ export default async function AuthLayout({
       {/* Right panel — fixed 420px on desktop; full-width on mobile.
           The form lives here. The 1px white/[0.07] border on the left
           edge is the seam, not a colored accent stripe. */}
-      <main
-        className="
-          relative z-10 flex w-full flex-col
-          border-l border-white/[0.07] bg-[#0a1f1a]/60
-          backdrop-blur-sm
-          lg:w-105 lg:min-w-105
-        "
-      >
+      <main className="relative z-10 flex w-full flex-col border-l border-white/[0.07] bg-[#0a1f1a]/60 backdrop-blur-sm lg:w-105 lg:min-w-105">
         {/* Mobile-only wordmark — only visible below the lg breakpoint.
             On desktop the left panel already carries the wordmark, so
             we hide this to avoid duplication. */}
@@ -188,13 +131,7 @@ export default async function AuthLayout({
             aria-label="Takda home"
             className="group inline-flex items-center gap-2"
           >
-            <span
-              className="
-                font-(family-name:--font-display) text-xl
-                font-extrabold tracking-tight text-[#e8f5ef]
-                transition-colors group-hover:text-white
-              "
-            >
+            <span className="font-(family-name:--font-display) text-xl font-extrabold tracking-tight text-[#e8f5ef] transition-colors group-hover:text-white">
               Takda
             </span>
             <span
@@ -221,21 +158,10 @@ export default async function AuthLayout({
 function Stat({ value, label }: { value: string; label: string }) {
   return (
     <div className="flex flex-col gap-2 pr-6 first:pl-0 last:pr-0">
-      <dt
-        className="
-          font-(family-name:--font-display)
-          text-[1.75rem] font-semibold leading-none tracking-[-0.015em]
-          text-[#e8f5ef]
-        "
-      >
+      <dt className="font-(family-name:--font-display) text-[1.75rem] font-semibold leading-none tracking-[-0.015em] text-[#e8f5ef]">
         {value}
       </dt>
-      <dd
-        className="
-          text-[11px] font-light tracking-wide
-          text-[#e8f5ef]/50
-        "
-      >
+      <dd className="text-[11px] font-light tracking-wide text-[#e8f5ef]/50">
         {label}
       </dd>
     </div>
