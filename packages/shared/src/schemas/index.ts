@@ -1,5 +1,7 @@
 export * from './business';
 export * from './service';
 export * from './booking';
+export * from './queue';
 export * from './slot';
 export * from './auth';
+

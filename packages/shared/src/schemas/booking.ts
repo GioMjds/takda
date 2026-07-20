@@ -42,3 +42,25 @@ export const bookingSchema = z.object({
 export type CreateBookingInput = z.input<typeof createBookingSchema>;
 export type CreateBookingOutput = z.output<typeof createBookingSchema>;
 export type Booking = z.infer<typeof bookingSchema>;
+
+export const queueTokenClaimsSchema = z.object({
+  sub: z.string(), // bookingId
+  businessId: z.string(),
+  role: z.literal('customer'),
+  iat: z.number(),
+  exp: z.number(),
+});
+export type QueueTokenClaims = z.infer<typeof queueTokenClaimsSchema>;
+
+export const queueTokenResponseSchema = z.object({
+  booking: bookingSchema,
+  queueToken: z.string(),
+  queueTokenExpiresAt: z.string().datetime(),
+});
+export type QueueTokenResponse = z.infer<typeof queueTokenResponseSchema>;
+
+export const refreshQueueTokenInputSchema = z.object({
+  phone: z.string().regex(PH_PHONE_REGEX),
+});
+export type RefreshQueueTokenInput = z.infer<typeof refreshQueueTokenInputSchema>;
+
