@@ -1,9 +1,9 @@
+import { UseFilters } from '@nestjs/common';
 import {
   WebSocketGateway,
   WebSocketServer,
   OnGatewayConnection,
   OnGatewayDisconnect,
-  UseFilters,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { OnEvent } from '@nestjs/event-emitter';
@@ -76,7 +76,9 @@ export class QueueGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.server
         .to(`queue:booking:${event.bookingId}`)
         .emit('queue.position', pos);
-    } catch {}
+    } catch {
+      // No action needed if position computation fails
+    }
   }
 
   @OnEvent('booking.changed')
