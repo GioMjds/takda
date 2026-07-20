@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { getDictionary } from '@/lib/i18n';
 import type { Locale } from '@/lib/i18n';
 import type { Route } from 'next';
+import { LogoutButton } from '@/components/shared/LogoutButton';
 
 export default async function DashboardLayout({
   children,
@@ -153,12 +154,7 @@ export default async function DashboardLayout({
         {/* Footer/Logout in sidebar */}
         <div className="pt-4 border-t border-gray-100 flex justify-between items-center text-xs font-semibold text-[#0d4f43]/60">
           <span>Takda Owner</span>
-          <Link
-            href={`/${lang}/login` as Route}
-            className="text-[#1a8c75] hover:underline"
-          >
-            Logout
-          </Link>
+          <LogoutButton lang={lang} className="text-[#1a8c75] hover:underline text-xs font-semibold" />
         </div>
       </aside>
 
@@ -174,12 +170,7 @@ export default async function DashboardLayout({
               Takda
             </span>
           </div>
-          <Link
-            href={`/${lang}/login` as Route}
-            className="text-xs font-semibold text-[#1a8c75] hover:underline"
-          >
-            Logout
-          </Link>
+          <LogoutButton lang={lang} className="text-xs font-semibold text-[#1a8c75] hover:underline" />
         </header>
 
         {/* Dynamic page contents */}

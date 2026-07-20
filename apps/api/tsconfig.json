@@ -10,15 +10,14 @@
     "target": "esnext",
     "sourceMap": true,
     "outDir": "./dist",
-    "rootDir": "../../",
+    "rootDir": "./src",
     "incremental": true,
     "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
     "strictNullChecks": true,
     "noImplicitAny": true,
     "paths": {
-      "@takda/shared": ["../../packages/shared/src/index.ts"],
-      "@takda/shared/*": ["../../packages/shared/src/*"],
-      "./*": ["./src/*"]
+      "@takda/shared": ["../../packages/shared/dist/index.d.ts"],
+      "@takda/shared/*": ["../../packages/shared/dist/*"]
     },
     "types": ["jest", "node"]
   },

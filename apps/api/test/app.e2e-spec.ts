@@ -21,7 +21,9 @@ describe('AppController (e2e)', () => {
       .get('/')
       .expect(200)
       .expect((res) => {
-        expect(res.body.message).toBe('Hello Takda! Welcome to the NestJS API!');
+        expect(res.body.message).toBe(
+          'Hello Takda! Welcome to the NestJS API!',
+        );
       });
   });
 

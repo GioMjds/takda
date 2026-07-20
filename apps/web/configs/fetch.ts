@@ -61,7 +61,7 @@ interface ApiResponse<T> {
 
 function getBaseUrl(): string {
   if (typeof window === 'undefined') {
-    return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
   }
   return process.env.NEXT_PUBLIC_API_URL || '';
 }
@@ -83,11 +83,10 @@ async function fetchFactory<TResponse>(
   },
 ): Promise<TResponse> {
   const base = getBaseUrl().replace(/\/+$/u, '');
-  const apiBase = `${base}/api`;
 
   const requestPath = path.startsWith('/')
-    ? `${apiBase}${path}`
-    : `${apiBase}/${path}`;
+    ? `${base}${path}`
+    : `${base}/${path}`;
   const url = new URL(requestPath);
 
   if (config.params) {

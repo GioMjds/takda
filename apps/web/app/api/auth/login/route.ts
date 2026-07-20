@@ -3,8 +3,19 @@ import { cookies } from 'next/headers';
 import { http, ApiError } from '@/configs/fetch';
 import { loginSchema } from '@takda/shared';
 
-interface LoginResponse {
-  accessToken: string;
+interface NestLoginResponse {
+  user: {
+    id: string;
+    tenantId: string;
+    email: string;
+    name: string;
+    role: string;
+  };
+  tokens: {
+    accessToken: string;
+    refreshToken: string;
+    expiresIn: number;
+  };
 }
 
 export async function POST(req: NextRequest) {
@@ -13,32 +24,54 @@ export async function POST(req: NextRequest) {
     const validated = loginSchema.parse(body);
 
     let accessToken = '';
+    let refreshToken = '';
+    let user = null;
 
     try {
-      const response = await http.post<LoginResponse>('/auth/login', validated);
-      accessToken = response.accessToken;
+      const response = await http.post<NestLoginResponse>('/v1/auth/login', validated);
+      accessToken = response.tokens.accessToken;
+      refreshToken = response.tokens.refreshToken;
+      user = response.user;
     } catch (apiErr) {
-      // In development or when NestJS API backend is offline/unimplemented,
-      // fallback to dev authentication for valid test dummy accounts.
-      if (process.env.NODE_ENV !== 'production' || (apiErr instanceof ApiError && (apiErr.status === 0 || apiErr.status === 404))) {
-        const mockRole = validated.email.includes('staff') ? 'STAFF' : validated.email.includes('admin') ? 'ADMIN' : 'OWNER';
-        accessToken = `dev_token_${Buffer.from(JSON.stringify({ email: validated.email, role: mockRole })).toString('base64url')}`;
+      if (
+        process.env.NODE_ENV !== 'production' &&
+        apiErr instanceof ApiError &&
+        (apiErr.status === 0 || apiErr.status === 404)
+      ) {
+        const mockRole = validated.email.includes('staff')
+          ? 'STAFF'
+          : validated.email.includes('admin')
+            ? 'ADMIN'
+            : 'OWNER';
+        accessToken = `dev_token_${Buffer.from(
+          JSON.stringify({ email: validated.email, role: mockRole }),
+        ).toString('base64url')}`;
       } else {
         throw apiErr;
       }
     }
 
-    // Store JWT / auth token in httpOnly cookie
+    // Store JWT / auth tokens in httpOnly cookies
     const cookieStore = await cookies();
     cookieStore.set('access_token', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      maxAge: 60 * 60 * 24 * 7,
     });
 
-    return NextResponse.json({ success: true });
+    if (refreshToken) {
+      cookieStore.set('refresh_token', refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 30 * 24 * 60 * 60,
+      });
+    }
+
+    return NextResponse.json({ success: true, user });
   } catch (error: unknown) {
     if (error instanceof ApiError) {
       return NextResponse.json(

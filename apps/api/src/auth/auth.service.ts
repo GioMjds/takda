@@ -18,7 +18,6 @@ import {
 } from '@takda/shared';
 import { UserRole } from '@prisma/client';
 
-// In-memory OTP store (5 min TTL) for single-tenant / local deployment
 interface OtpEntry {
   code: string;
   expiresAt: Date;
@@ -107,7 +106,12 @@ export class AuthService {
     });
 
     // 5. Generate Tokens
-    const tokens = await this.issueTokens(user.id, user.tenantId, user.email, user.role);
+    const tokens = await this.issueTokens(
+      user.id,
+      user.tenantId,
+      user.email,
+      user.role,
+    );
 
     return {
       user: {
@@ -135,7 +139,10 @@ export class AuthService {
       });
     }
 
-    const isPasswordValid = await bcrypt.compare(dto.password, user.passwordHash);
+    const isPasswordValid = await bcrypt.compare(
+      dto.password,
+      user.passwordHash,
+    );
     if (!isPasswordValid) {
       throw new UnauthorizedException({
         statusCode: 401,
@@ -144,7 +151,12 @@ export class AuthService {
       });
     }
 
-    const tokens = await this.issueTokens(user.id, user.tenantId, user.email, user.role);
+    const tokens = await this.issueTokens(
+      user.id,
+      user.tenantId,
+      user.email,
+      user.role,
+    );
 
     return {
       user: {
@@ -225,7 +237,12 @@ export class AuthService {
       });
     }
 
-    const tokens = await this.issueTokens(user.id, user.tenantId, user.email, user.role);
+    const tokens = await this.issueTokens(
+      user.id,
+      user.tenantId,
+      user.email,
+      user.role,
+    );
 
     return {
       user: {
@@ -240,7 +257,12 @@ export class AuthService {
   }
 
   async refreshToken(rawRefreshToken: string) {
-    let payload: { sub: string; tenantId: string; email: string; role: UserRole };
+    let payload: {
+      sub: string;
+      tenantId: string;
+      email: string;
+      role: UserRole;
+    };
     try {
       payload = await this.jwtService.verifyAsync(rawRefreshToken, {
         secret: ENV.JWT_SECRET,
@@ -286,7 +308,9 @@ export class AuthService {
     });
 
     // Issue fresh tokens
-    const user = await this.prisma.user.findUnique({ where: { id: payload.sub } });
+    const user = await this.prisma.user.findUnique({
+      where: { id: payload.sub },
+    });
     if (!user) {
       throw new UnauthorizedException({
         statusCode: 401,
@@ -295,7 +319,12 @@ export class AuthService {
       });
     }
 
-    const tokens = await this.issueTokens(user.id, user.tenantId, user.email, user.role);
+    const tokens = await this.issueTokens(
+      user.id,
+      user.tenantId,
+      user.email,
+      user.role,
+    );
 
     return { tokens };
   }
