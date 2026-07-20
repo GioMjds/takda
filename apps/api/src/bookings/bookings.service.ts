@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { ERROR_CODES } from '@takda/shared';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PrismaService } from '../prisma/prisma.service';
 import { QueueTokenService } from '../queue/queue-token.service';
@@ -19,7 +20,7 @@ export class BookingsService {
     });
     if (!business) {
       throw new NotFoundException({
-        code: 'BUSINESS_NOT_FOUND',
+        code: ERROR_CODES.BUSINESS_NOT_FOUND,
         message: `Business '${businessSlug}' not found`,
       });
     }
@@ -29,7 +30,7 @@ export class BookingsService {
     });
     if (!service || service.businessId !== business.id || !service.isActive) {
       throw new NotFoundException({
-        code: 'SERVICE_NOT_FOUND',
+        code: ERROR_CODES.SERVICE_NOT_FOUND,
         message: `Service '${dto.serviceId}' not found`,
       });
     }
@@ -80,7 +81,7 @@ export class BookingsService {
     } catch (err: any) {
       if (err.code === 'P2002') {
         throw new ConflictException({
-          code: 'SLOT_TAKEN',
+          code: ERROR_CODES.SLOT_TAKEN,
           message: 'The selected slot has already been booked',
         });
       }

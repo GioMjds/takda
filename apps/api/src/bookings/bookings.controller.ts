@@ -3,7 +3,7 @@ import { Throttle } from '@nestjs/throttler';
 import { Public } from '../common/decorators/public.decorator';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { BookingsService } from './bookings.service';
-import { createBookingInputSchema, CreateBookingInput } from '@takda/shared';
+import { createBookingSchema, CreateBookingInput } from '@takda/shared';
 
 @Controller('v1/businesses')
 export class BookingsController {
@@ -12,7 +12,7 @@ export class BookingsController {
   @Public()
   @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post(':slug/bookings')
-  @UsePipes(new ZodValidationPipe(createBookingInputSchema))
+  @UsePipes(new ZodValidationPipe(createBookingSchema))
   async createBooking(
     @Param('slug') slug: string,
     @Body() dto: CreateBookingInput,
