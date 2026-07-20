@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { QueueTokenClaims } from '@takda/shared';
+import { ERROR_CODES, QueueTokenClaims } from '@takda/shared';
 
 @Injectable()
 export class QueueTokenService {
@@ -46,7 +46,7 @@ export class QueueTokenService {
       });
     } catch {
       throw new UnauthorizedException({
-        code: 'QUEUE_TOKEN_INVALID',
+        code: ERROR_CODES.QUEUE_TOKEN_INVALID,
         message: 'Invalid or expired queue token',
       });
     }
