@@ -12,6 +12,11 @@ import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
+import { QueueModule } from './queue/queue.module';
+import { BookingsModule } from './bookings/bookings.module';
+import { BusinessesModule } from './businesses/businesses.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -53,6 +58,11 @@ import { RolesGuard } from './common/guards/roles.guard';
     }),
     PrismaModule,
     AuthModule,
+    QueueModule,
+    BookingsModule,
+    BusinessesModule,
+    NotificationsModule,
+    EmailModule,
   ],
   providers: [
     {
