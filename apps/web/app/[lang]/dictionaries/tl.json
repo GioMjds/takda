@@ -1,1 +1,120 @@
-{}
+{
+  "common": {
+    "loading": "Naglo-load...",
+    "save": "I-save",
+    "cancel": "Kanselahin",
+    "back": "Bumalik",
+    "submit": "Ipadala"
+  },
+  "login": {
+    "title": "Login ng May-ari",
+    "subtitle": "Pamahalaan ang iyong pila at mga appointment",
+    "phone": "Numero ng Telepono",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Mag-sign in",
+    "noAccount": "Walang account?",
+    "register": "Iparehistro ang iyong negosyo",
+    "heading": "Maligayang pagbabalik",
+    "subheading": "Mag-sign in sa iyong Takda business account",
+    "emailPlaceholder": "owner@example.com",
+    "forgotPassword": "Nakalimutan ang password?",
+    "forgotPasswordNotice": "Para i-reset ang iyong password o i-recover ang account, makipag-ugnayan sa iyong Takda business administrator o support.",
+    "error": {
+      "invalid": "Mali ang email o password. Subukan muli.",
+      "network": "Hindi maabot ang server. Suriin ang koneksyon at subukan muli.",
+      "generic": "May nangyaring mali. Subukan muli."
+    },
+    "footer": "Kailangan ng access? Makipag-ugnayan sa iyong Takda admin."
+  },
+  "onboarding": {
+    "title": "I-setup ang Iyong Negosyo",
+    "subtitle": "Magsimula sa Takda sa loob ng ilang minuto",
+    "businessName": "Pangalan ng Negosyo",
+    "businessSlug": "Custom Link (Slug)",
+    "phone": "Numero ng Kontakt",
+    "submit": "Gumawa ng Negosyo"
+  },
+  "dashboard": {
+    "title": "Live na Pila",
+    "subtitle": "Subaybayan at pamahalaan ang mga walk-in at booking",
+    "tabs": {
+      "queue": "Pila",
+      "slots": "Mga Slot",
+      "qr": "QR Code",
+      "analytics": "Analytics",
+      "settings": "Mga Setting"
+    },
+    "noBookings": "Walang mga booking para sa araw na ito."
+  },
+  "booking": {
+    "title": "Mag-book ng Appointment",
+    "subtitle": "Pumili ng slot at i-reserve ang iyong pila",
+    "name": "Iyong Pangalan",
+    "phone": "Numero ng Telepono",
+    "submit": "Kumpirmahin ang Booking",
+    "header": {
+      "openNow": "Bukás ngayon",
+      "closed": "Sarado",
+      "fullyBooked": "Puno na",
+      "slotsLeft": "{count} slots natitira",
+      "noSlots": "Walang slot natitira"
+    },
+    "serviceSelector": {
+      "label": "Pumili ng serbisyo",
+      "minutes": "min"
+    },
+    "slotGrid": {
+      "label": "Mga oras ngayong araw",
+      "leftCount": "{count} natitira",
+      "fullyBookedShort": "Puno",
+      "remaining": "{count} natitira",
+      "empty": "Walang bakanteng oras ngayon. Subukan ulit bukas."
+    },
+    "form": {
+      "nameLabel": "Iyong buong pangalan",
+      "namePlaceholder": "Juan dela Cruz",
+      "phoneLabel": "Numero ng cellphone",
+      "phonePlaceholder": "09XXXXXXXXX",
+      "phoneHint": "Philippine mobile (hal. 09XXXXXXXXX)",
+      "phoneError": "Maglagay ng wastong Philippine mobile number.",
+      "recap": "Magbu-book para sa {time}",
+      "cta": "I-book ang slot — {time}",
+      "ctaNoSlot": "Pumili muna ng oras",
+      "submitting": "Pinapareserba…",
+      "rootConflict": "Puno na ang slot na iyon. Pumili ng ibang oras."
+    },
+    "confirmation": {
+      "heading": "Naka-book ka na!",
+      "subheading": "Nareserba na ang iyong slot sa {business}.",
+      "queueLine": "Ika-{position} ka sa pila ngayong araw",
+      "queueLabel": "Posisyon sa pila",
+      "whenLabel": "Petsa at oras",
+      "addressLabel": "Address",
+      "smsNote": "Magpapadala kami ng SMS na paalala bago ang iyong oras.",
+      "another": "Mag-book muli"
+    },
+    "notFound": {
+      "heading": "Hindi nahanap ang negosyo",
+      "body": "Maaaring luma na ang QR code o link. Subukang mag-scan muli.",
+      "back": "Bumalik sa simula"
+    }
+  },
+  "confirm": {
+    "title": "Kumpirmado na ang Booking!",
+    "subtitle": "Na-reserve na ang iyong slot.",
+    "queuePosition": "Iyong posisyon sa pila:",
+    "reminder": "Makakatanggap ka ng SMS reminder sa madaling panahon."
+  },
+  "positionCard": {
+    "yourSlot": "Oras mo",
+    "yourNumber": "Numero mo sa linya",
+    "estimatedWait": "Tantyang oras ng paghihintay",
+    "peopleAhead": "{count} tao ang nasa unahan mo",
+    "youAreNext": "Ikaw na ang kasunod!",
+    "reconnecting": "Kumokonekta muli...",
+    "expired": "Nag-expire ang session",
+    "tapToRejoin": "Pindutin para bumalik sa linya",
+    "terminalState": "Hindi na aktibo ang iyong booking"
+  }
+}

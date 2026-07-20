@@ -27,16 +27,16 @@ export const bookingSchema = z.object({
   tenantId: z.string(),
   businessId: z.string(),
   serviceId: z.string(),
-  slotStart: z.date(),
+  slotStart: z.coerce.date(),
   customerName: z.string(),
   customerPhone: z.string(),
   notes: z.string().nullable().optional(),
   source: z.enum(['ONLINE', 'WALK_IN', 'STAFF', 'IMPORT']),
   status: bookingStatusSchema,
   idempotencyKey: z.string().nullable().optional(),
-  resolvedAt: z.date().nullable().optional(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  resolvedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
 });
 
 export type CreateBookingInput = z.input<typeof createBookingSchema>;

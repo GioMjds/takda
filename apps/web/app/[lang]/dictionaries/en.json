@@ -1,1 +1,120 @@
-{}
+{
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "back": "Back",
+    "submit": "Submit"
+  },
+  "login": {
+    "title": "Owner Login",
+    "subtitle": "Manage your walk-in queue and appointments",
+    "phone": "Phone Number",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Sign in",
+    "noAccount": "Don't have an account?",
+    "register": "Register your business",
+    "heading": "Welcome back",
+    "subheading": "Sign in to your Takda business account",
+    "emailPlaceholder": "owner@example.com",
+    "forgotPassword": "Forgot password?",
+    "forgotPasswordNotice": "To reset your password or recover your business account, please contact your Takda administrator or support.",
+    "error": {
+      "invalid": "Incorrect email or password. Try again.",
+      "network": "Can't reach the server. Check your connection and try again.",
+      "generic": "Something went wrong. Please try again."
+    },
+    "footer": "Need access? Contact your Takda admin."
+  },
+  "onboarding": {
+    "title": "Setup Your Business",
+    "subtitle": "Get started with Takda in minutes",
+    "businessName": "Business Name",
+    "businessSlug": "Custom Link (Slug)",
+    "phone": "Contact Number",
+    "submit": "Create Business"
+  },
+  "dashboard": {
+    "title": "Live Queue",
+    "subtitle": "Monitor and manage walk-ins and bookings",
+    "tabs": {
+      "queue": "Queue",
+      "slots": "Slots",
+      "qr": "QR Code",
+      "analytics": "Analytics",
+      "settings": "Settings"
+    },
+    "noBookings": "No bookings for today yet."
+  },
+  "booking": {
+    "title": "Book an Appointment",
+    "subtitle": "Select a slot and reserve your turn",
+    "name": "Your Name",
+    "phone": "Phone Number",
+    "submit": "Confirm Booking",
+    "header": {
+      "openNow": "Open now",
+      "closed": "Closed",
+      "fullyBooked": "Fully booked",
+      "slotsLeft": "{count} slots left",
+      "noSlots": "No slots left today"
+    },
+    "serviceSelector": {
+      "label": "Select a service",
+      "minutes": "min"
+    },
+    "slotGrid": {
+      "label": "Available times today",
+      "leftCount": "{count} left",
+      "fullyBookedShort": "Full",
+      "remaining": "{count} left",
+      "empty": "No more available slots for today. Please check back tomorrow."
+    },
+    "form": {
+      "nameLabel": "Your full name",
+      "namePlaceholder": "Juan dela Cruz",
+      "phoneLabel": "Mobile number",
+      "phonePlaceholder": "09XXXXXXXXX",
+      "phoneHint": "Philippine mobile (e.g. 09XXXXXXXXX)",
+      "phoneError": "Enter a valid Philippine mobile number.",
+      "recap": "Booking for {time}",
+      "cta": "Book slot — {time}",
+      "ctaNoSlot": "Pick a time first",
+      "submitting": "Reserving…",
+      "rootConflict": "That slot just filled up. Pick another time."
+    },
+    "confirmation": {
+      "heading": "You're booked!",
+      "subheading": "Your turn at {business} is reserved.",
+      "queueLine": "You're #{position} in line today",
+      "queueLabel": "Queue position",
+      "whenLabel": "Date & time",
+      "addressLabel": "Address",
+      "smsNote": "We'll send you a reminder before your slot.",
+      "another": "Book another slot"
+    },
+    "notFound": {
+      "heading": "This business wasn't found",
+      "body": "The QR code or link may be outdated. Try scanning again.",
+      "back": "Back to home"
+    }
+  },
+  "confirm": {
+    "title": "Booking Confirmed!",
+    "subtitle": "Your slot has been reserved.",
+    "queuePosition": "Your position in queue:",
+    "reminder": "You will receive an SMS reminder shortly."
+  },
+  "positionCard": {
+    "yourSlot": "Your Slot",
+    "yourNumber": "Your Queue Number",
+    "estimatedWait": "Estimated Wait",
+    "peopleAhead": "{count} people ahead of you",
+    "youAreNext": "You're next!",
+    "reconnecting": "Reconnecting...",
+    "expired": "Session expired",
+    "tapToRejoin": "Tap to rejoin queue",
+    "terminalState": "Your booking is no longer active"
+  }
+}
