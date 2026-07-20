@@ -17,6 +17,10 @@ export interface PositionCardProps {
 }
 
 export function PositionCard(props: PositionCardProps) {
+  if (!props || !props.initialPosition) {
+    return null;
+  }
+
   const { position, totalActive, status, onTapToRejoin } = useQueuePosition({
     bookingId: props.bookingId,
     businessId: props.businessId,

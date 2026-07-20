@@ -1,8 +1,8 @@
 import React from 'react';
-import { PositionCard } from './_PositionCard';
-import { useQueuePosition } from '../hooks/_useQueuePosition';
+import { PositionCard } from '@/pages/[lang]/b/[businessSlug]/sections/_PositionCard';
+import { useQueuePosition } from '@/pages/[lang]/b/[businessSlug]/hooks/_useQueuePosition';
 
-jest.mock('../hooks/_useQueuePosition');
+jest.mock('@/pages/[lang]/b/[businessSlug]/hooks/_useQueuePosition');
 
 describe('PositionCard component unit tests', () => {
   const mockTapToRejoin = jest.fn();

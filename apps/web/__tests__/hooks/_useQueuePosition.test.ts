@@ -1,7 +1,7 @@
 import React from 'react';
 import { io } from 'socket.io-client';
 import { refreshQueueToken } from '@/lib/api';
-import { useQueuePosition, UseQueuePositionOptions } from './_useQueuePosition';
+import { useQueuePosition, UseQueuePositionOptions } from '@/pages/[lang]/b/[businessSlug]/hooks/_useQueuePosition';
 import type { QueuePosition } from '@takda/shared';
 
 jest.mock('socket.io-client');
@@ -87,9 +87,6 @@ describe('useQueuePosition hook unit tests', () => {
     });
   });
 
-  /**
-   * Helper function to run useQueuePosition under simulated React hook state/effect cycles.
-   */
   function runHook(opts: UseQueuePositionOptions = defaultOpts) {
     let position = opts.initialPosition;
     let totalActive: number | null = null;
@@ -98,7 +95,6 @@ describe('useQueuePosition hook unit tests', () => {
 
     const stateMap = new Map<any, any>();
 
-    // Mock useState
     jest.spyOn(React, 'useState').mockImplementation(((initial: any) => {
       if (!stateMap.has(initial)) {
         stateMap.set(initial, initial);
@@ -115,14 +111,11 @@ describe('useQueuePosition hook unit tests', () => {
       return [val, setter];
     }) as any);
 
-    // Mock useRef
     const socketRef = { current: null as any };
     jest.spyOn(React, 'useRef').mockReturnValue(socketRef);
 
-    // Mock useCallback
     jest.spyOn(React, 'useCallback').mockImplementation(((fn: any) => fn) as any);
 
-    // Mock useEffect execution
     let effectCleanup: (() => void) | void;
     jest.spyOn(React, 'useEffect').mockImplementation(((effect: any) => {
       effectCleanup = effect();
@@ -211,7 +204,6 @@ describe('useQueuePosition hook unit tests', () => {
 
     hook.socket.trigger('exception', { code: 'QUEUE_TOKEN_INVALID' });
 
-    // Wait for async refresh handleSilentRefresh to complete
     await new Promise((resolve) => setTimeout(resolve, 10));
 
     expect(refreshQueueToken).toHaveBeenCalledWith('b_123', '+639171234567');

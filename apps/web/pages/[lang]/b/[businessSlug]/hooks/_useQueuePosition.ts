@@ -96,4 +96,9 @@ export function useQueuePosition(
   };
 }
 
-export default useQueuePosition;
+// Next.js Pages Router compatibility dummy export
+export default function HookDummy() {
+  return null;
+}
+
+
