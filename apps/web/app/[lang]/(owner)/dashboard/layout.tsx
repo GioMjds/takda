@@ -126,14 +126,14 @@ export default async function DashboardLayout({
   ];
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-[#f7fafa]">
+    <div className="min-h-screen flex flex-col md:flex-row bg-background text-foreground transition-colors duration-300">
       {/* Sidebar for desktop */}
-      <aside className="hidden md:flex md:flex-col md:w-64 bg-white border-r border-[#a8ddd4]/30 p-6 space-y-8">
+      <aside className="hidden md:flex md:flex-col md:w-64 bg-card border-r border-border/60 p-6 space-y-8 text-card-foreground">
         <div className="flex items-center gap-3">
-          <span className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-[#1a8c75] text-[#f7fafa] font-bold text-lg">
+          <span className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-primary text-primary-foreground font-bold text-lg shadow-sm">
             T
           </span>
-          <span className="font-extrabold text-xl text-[#0d4f43] tracking-tight">
+          <span className="font-extrabold text-xl text-foreground tracking-tight">
             Takda
           </span>
         </div>
@@ -143,7 +143,7 @@ export default async function DashboardLayout({
             <Link
               key={item.name}
               href={item.href}
-              className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold text-[#0d4f43]/80 hover:text-[#1a8c75] hover:bg-[#e3f5f0]/30 transition"
+              className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold text-muted-foreground hover:text-primary hover:bg-muted/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               <span className="text-inherit">{item.icon}</span>
               <span>{item.name}</span>
@@ -152,25 +152,25 @@ export default async function DashboardLayout({
         </nav>
 
         {/* Footer/Logout in sidebar */}
-        <div className="pt-4 border-t border-gray-100 flex justify-between items-center text-xs font-semibold text-[#0d4f43]/60">
+        <div className="pt-4 border-t border-border/50 flex justify-between items-center text-xs font-semibold text-muted-foreground">
           <span>Takda Owner</span>
-          <LogoutButton lang={lang} className="text-[#1a8c75] hover:underline text-xs font-semibold" />
+          <LogoutButton lang={lang} className="text-primary hover:underline text-xs font-semibold" />
         </div>
       </aside>
 
       {/* Main Content shell */}
       <div className="flex-1 flex flex-col min-h-screen">
         {/* Header for mobile */}
-        <header className="md:hidden flex items-center justify-between bg-white px-4 py-3 border-b border-[#a8ddd4]/30">
+        <header className="md:hidden flex items-center justify-between bg-card px-4 py-3 border-b border-border/60 text-card-foreground">
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-[#1a8c75] text-[#f7fafa] font-bold text-sm">
+            <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-primary-foreground font-bold text-sm">
               T
             </span>
-            <span className="font-bold text-base text-[#0d4f43] tracking-tight">
+            <span className="font-bold text-base text-foreground tracking-tight">
               Takda
             </span>
           </div>
-          <LogoutButton lang={lang} className="text-xs font-semibold text-[#1a8c75] hover:underline" />
+          <LogoutButton lang={lang} className="text-xs font-semibold text-primary hover:underline" />
         </header>
 
         {/* Dynamic page contents */}
@@ -179,12 +179,12 @@ export default async function DashboardLayout({
         </main>
 
         {/* Bottom Nav bar for mobile */}
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#a8ddd4]/30 flex justify-around py-2 z-50">
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border/60 flex justify-around py-2 z-50 text-card-foreground">
           {navigationItems.map((item) => (
             <Link
               key={item.name}
               href={item.href}
-              className="flex flex-col items-center justify-center flex-1 text-center py-1 text-[#0d4f43]/80 hover:text-[#1a8c75] active:text-[#1a8c75] transition"
+              className="flex flex-col items-center justify-center flex-1 text-center py-1 text-muted-foreground hover:text-primary active:text-primary transition-colors"
             >
               <span>{item.icon}</span>
               <span className="text-[10px] font-semibold mt-0.5">

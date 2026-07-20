@@ -21,6 +21,6 @@ export type QueueSnapshot = z.infer<typeof queueSnapshotSchema>;
 export const queueBookingChangedSchema = z.object({
   bookingId: z.string(),
   status: bookingStatusSchema,
-  slotStart: z.string().datetime(),
+  slotStart: z.iso.datetime(),
 });
 export type QueueBookingChanged = z.infer<typeof queueBookingChangedSchema>;

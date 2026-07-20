@@ -17,6 +17,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./business"), exports);
 __exportStar(require("./service"), exports);
 __exportStar(require("./booking"), exports);
+__exportStar(require("./queue"), exports);
 __exportStar(require("./slot"), exports);
 __exportStar(require("./auth"), exports);
 //# sourceMappingURL=index.js.map

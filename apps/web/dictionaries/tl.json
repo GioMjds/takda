@@ -18,6 +18,8 @@
     "heading": "Maligayang pagbabalik",
     "subheading": "Mag-sign in sa iyong Takda business account",
     "emailPlaceholder": "owner@example.com",
+    "forgotPassword": "Nakalimutan ang password?",
+    "forgotPasswordNotice": "Para i-reset ang iyong password o i-recover ang account, makipag-ugnayan sa iyong Takda business administrator o support.",
     "error": {
       "invalid": "Mali ang email o password. Subukan muli.",
       "network": "Hindi maabot ang server. Suriin ang koneksyon at subukan muli.",

@@ -1,24 +1,3 @@
-// =============================================================================
-// Takda — Prisma schema
-// -----------------------------------------------------------------------------
-// Source of truth for the storage layer. The Zod schemas in @takda/shared are
-// the *wire* contract; this file is the *storage* contract. Keep them in
-// sync — do not let one drift silently from the other.
-//
-// Conventions:
-//   • All `id` columns are CUIDs (string) — sortable, URL-safe, no PII.
-//   • All time columns are `timestamptz` in Postgres / `DateTime` in Prisma.
-//     Always store UTC; the web renders to Asia/Manila.
-//   • Soft-delete is intentionally absent. Bookings have a terminal `status`
-//     (cancelled / no_show) instead of being deleted.
-//   • Enums live at the bottom of this file.
-//   • Indexes are added where a hot path is known:
-//       - tenantId on every tenant-scoped table
-//       - businessId + slotStart on Booking (queue + lookup)
-//       - (serviceId, slotStart) UNIQUE on BookingSlot (concurrency)
-//       - phone on Booking (owner-side customer lookup)
-// =============================================================================
-
 generator client {
   provider = "prisma-client-js"
 }

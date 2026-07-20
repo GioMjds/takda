@@ -45,6 +45,19 @@ export async function generateMetadata({
       lang === 'tl'
         ? 'Sistema para sa mas madaling pila at appointment booking.'
         : 'Queue and appointment booking platform for walk-in businesses.',
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: 'default',
+      title: 'Takda',
+    },
+    icons: {
+      icon: [
+        { url: '/favicon.ico', sizes: 'any' },
+        { url: '/icon-192.png', type: 'image/png', sizes: '192x192' },
+      ],
+      shortcut: '/favicon.ico',
+      apple: '/apple-icon.png',
+    },
   };
 }
 

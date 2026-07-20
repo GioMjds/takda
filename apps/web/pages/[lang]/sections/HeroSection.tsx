@@ -31,13 +31,12 @@ export function HeroSection({ lang }: HeroSectionProps) {
       aria-labelledby="hero-title"
       className="relative mx-auto flex w-full max-w-6xl flex-col items-center px-6 pt-20 pb-16 text-center sm:px-8 sm:pt-28 sm:pb-20 lg:pt-36 lg:pb-24"
     >
-      {/* Eyebrow pill — small, on-brand, low contrast so it doesn't
-          compete with the H1. The 5px teal dot anchors the brand. */}
+      {/* Eyebrow pill */}
       <motion.div {...fadeUp(0 * stagger)}>
-        <span className="inline-flex items-center gap-2 rounded-full border border-[#1D9E75]/30 bg-[#1D9E75]/12 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#5DCAA5]">
+        <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary dark:text-[#5DCAA5]">
           <span
             aria-hidden="true"
-            className="h-1.5 w-1.5 rounded-full bg-[#1D9E75] shadow-[0_0_10px_2px_rgba(29,158,117,0.55)]"
+            className="h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_10px_2px_rgba(29,158,117,0.55)]"
           />
           {isEn
             ? 'Queue management for Filipino businesses'
@@ -45,102 +44,90 @@ export function HeroSection({ lang }: HeroSectionProps) {
         </span>
       </motion.div>
 
-      {/* H1 — fluid clamp() so it scales smoothly from phone to
-          ultra-wide without manually breakpointing the headline.
-          Single h1 per page, balance-wrapped. */}
+      {/* H1 */}
       <motion.h1
         id="hero-title"
         {...fadeUp(1 * stagger)}
-        className="mt-7 max-w-4xl font-[family-name:var(--font-display)] font-extrabold text-[clamp(2.5rem,5.6vw,4.25rem)] leading-[1.06] tracking-[-0.025em] text-[#e8f5ef] text-balance"
+        className="mt-7 max-w-4xl font-[family-name:var(--font-display)] font-extrabold text-[clamp(2.5rem,5.6vw,4.25rem)] leading-[1.06] tracking-[-0.025em] text-foreground text-balance"
       >
         {isEn ? (
           <>
             Your counter, your{' '}
-            <em className="not-italic text-[#5DCAA5] [font-style:italic] [font-weight:800]">
+            <em className="not-italic text-primary dark:text-[#5DCAA5] [font-style:italic] [font-weight:800]">
               queue, your rules.
             </em>
           </>
         ) : (
           <>
             Sa inyong counter,{' '}
-            <em className="not-italic text-[#5DCAA5] [font-style:italic] [font-weight:800]">
+            <em className="not-italic text-primary dark:text-[#5DCAA5] [font-style:italic] [font-weight:800]">
               inyong pila, inyong takda.
             </em>
           </>
         )}
       </motion.h1>
 
-      {/* Subheadline — body copy at 16px, weight 300. Max-w-md keeps the
-          measure short so the eye doesn't drift across an ocean of
-          muted type. */}
+      {/* Subheadline */}
       <motion.p
         {...fadeUp(2 * stagger)}
-        className="mt-6 max-w-md text-base font-light leading-relaxed text-[#e8f5ef]/55"
+        className="mt-6 max-w-md text-base font-light leading-relaxed text-muted-foreground"
       >
         {isEn
           ? 'A queue and booking system for walk-in shops, salons, and LGU offices. Customers scan, you serve — no more paper lists, no more guessing who is next.'
           : 'Queue at booking system para sa walk-in na shop, salon, at LGU offices. Customer mag-scan, kayo nagsilbi — walang papel, walang hulaan kung sino ang susunod.'}
       </motion.p>
 
-      {/* Action row — primary CTA first (the brief's single conversion
-          goal), ghost secondary for the curious-but-not-yet buyer. */}
+      {/* Action row */}
       <motion.div
         {...fadeUp(3 * stagger)}
         className="mt-10 flex w-full max-w-md flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:items-center sm:gap-3"
       >
         <Link
           href={`/${lang}/onboarding` as Route}
-          className="group inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-[#1D9E75] px-5 text-sm font-semibold text-white shadow-[0_10px_30px_-10px_rgba(29,158,117,0.6)] transition-all hover:bg-[#5DCAA5] hover:text-[#0a1f1a] hover:shadow-[0_14px_36px_-10px_rgba(93,202,165,0.55)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5DCAA5] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1f1a]"
+          className="group inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-md transition-all hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
         >
           <QrCode className="size-4" aria-hidden="true" />
           <span>{isEn ? 'Get your free QR code' : 'Kunin ang iyong QR code'}</span>
         </Link>
         <Link
           href="#how-it-works"
-          className="group inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-5 text-sm font-semibold text-[#e8f5ef]/85 backdrop-blur-sm transition-all hover:border-white/20 hover:bg-white/[0.08] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1f1a]"
+          className="group inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-border/80 bg-card/60 px-5 text-sm font-semibold text-foreground backdrop-blur-sm transition-all hover:border-primary/50 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
         >
           <Play
-            className="size-3.5 fill-[#5DCAA5] text-[#5DCAA5] transition-transform group-hover:translate-x-0.5"
+            className="size-3.5 fill-primary text-primary transition-transform group-hover:translate-x-0.5"
             aria-hidden="true"
           />
           <span>{isEn ? 'See how it works' : 'Tingnan kung paano'}</span>
         </Link>
       </motion.div>
 
-      {/* Social proof strip — stacked avatar circles + faint count. The
-          avatars are flat, low-saturation tints of the brand palette
-          (no random photo placeholders). The "200+" figure is a
-          commitment; we keep it modest so it doesn't read as
-          hero-metric SaaS template. */}
+      {/* Social proof strip */}
       <motion.div {...fadeUp(4 * stagger)} className="mt-10 flex items-center gap-3">
         <div className="flex -space-x-2" aria-hidden="true">
-          <Avatar initials="JR" fill="#1D9E75" ring="#0a1f1a" />
-          <Avatar initials="MA" fill="#5DCAA5" ring="#0a1f1a" />
-          <Avatar initials="PD" fill="#A8DDD4" ring="#0a1f1a" text="#0d4f43" />
-          <Avatar initials="SL" fill="#0D4F43" ring="#0a1f1a" />
+          <Avatar initials="JR" fill="var(--color-primary)" ring="var(--color-background)" text="#ffffff" />
+          <Avatar initials="MA" fill="oklch(0.7 0.12 171.6)" ring="var(--color-background)" text="#0d4f43" />
+          <Avatar initials="PD" fill="oklch(0.85 0.08 175.4)" ring="var(--color-background)" text="#0d4f43" />
+          <Avatar initials="SL" fill="oklch(0.35 0.08 170.3)" ring="var(--color-background)" text="#ffffff" />
         </div>
-        <p className="text-xs font-medium text-[#e8f5ef]/45">
+        <p className="text-xs font-medium text-muted-foreground">
           {isEn
             ? '200+ Filipino businesses already using Takda'
             : '200+ negosyo na ang gumagamit ng Takda'}
         </p>
       </motion.div>
 
-      {/* Decorative micro-floats — visible on lg+ only. They sit in the
-          right margin to add a sense of "things happening" without
-          committing to full illustration. Both are aria-hidden so they
-          do not contribute to the page's accessible name set. */}
+      {/* Decorative micro-floats */}
       <motion.div
         {...fadeUp(5 * stagger)}
         className="pointer-events-none absolute right-6 top-1/2 hidden -translate-y-1/2 lg:block"
         aria-hidden="true"
       >
-        <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 backdrop-blur-md">
+        <div className="flex items-center gap-2 rounded-lg border border-border/60 bg-card/80 px-3 py-2 shadow-xs backdrop-blur-md">
           <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#1D9E75] opacity-75" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#5DCAA5]" />
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
           </span>
-          <span className="text-[11px] font-medium text-[#e8f5ef]/75">
+          <span className="text-[11px] font-medium text-foreground">
             {isEn ? 'Open today · 8 slots left' : 'Bukás · 8 slots natitira'}
           </span>
         </div>
@@ -151,10 +138,10 @@ export function HeroSection({ lang }: HeroSectionProps) {
         className="pointer-events-none absolute left-6 top-32 hidden lg:block"
         aria-hidden="true"
       >
-        <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 backdrop-blur-md">
-          <Clock className="size-3 text-[#5DCAA5]" aria-hidden="true" />
-          <span className="font-mono text-[11px] text-[#e8f5ef]/75">09:42</span>
-          <span className="text-[11px] text-[#e8f5ef]/55">
+        <div className="flex items-center gap-2 rounded-lg border border-border/60 bg-card/80 px-3 py-2 shadow-xs backdrop-blur-md">
+          <Clock className="size-3 text-primary" aria-hidden="true" />
+          <span className="font-mono text-[11px] text-foreground">09:42</span>
+          <span className="text-[11px] text-muted-foreground">
             {isEn ? 'next slot' : 'sunod na slot'}
           </span>
         </div>
@@ -165,9 +152,9 @@ export function HeroSection({ lang }: HeroSectionProps) {
         className="pointer-events-none absolute right-12 bottom-6 hidden lg:block"
         aria-hidden="true"
       >
-        <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 backdrop-blur-md">
-          <MapPin className="size-3 text-[#5DCAA5]" aria-hidden="true" />
-          <span className="text-[11px] text-[#e8f5ef]/75">
+        <div className="flex items-center gap-2 rounded-lg border border-border/60 bg-card/80 px-3 py-2 shadow-xs backdrop-blur-md">
+          <MapPin className="size-3 text-primary" aria-hidden="true" />
+          <span className="text-[11px] text-foreground">
             {isEn ? 'Pilar Public Market' : 'Pilar Public Market'}
           </span>
         </div>

@@ -31,6 +31,8 @@ export async function LoginView({ lang }: LoginViewProps) {
           email: dict.login.email,
           emailPlaceholder: dict.login.emailPlaceholder,
           password: dict.login.password,
+          forgotPassword: dict.login.forgotPassword,
+          forgotPasswordNotice: dict.login.forgotPasswordNotice,
           submit: dict.login.submit,
           error: dict.login.error,
           footer: dict.login.footer,

@@ -42,50 +42,47 @@ export function FeaturesSection({ lang }: FeaturesSectionProps) {
       <div className="mb-12 max-w-2xl sm:mb-14">
         <h2
           id="features-title"
-          className="font-[family-name:var(--font-display)] text-[clamp(1.75rem,3.4vw,2.5rem)] font-extrabold leading-[1.1] tracking-[-0.02em] text-[#e8f5ef] text-balance"
+          className="font-[family-name:var(--font-display)] text-[clamp(1.75rem,3.4vw,2.5rem)] font-extrabold leading-[1.1] tracking-[-0.02em] text-foreground text-balance"
         >
           {isEn ? (
             <>
               Built for the way{' '}
-              <span className="text-[#5DCAA5]">your counter</span> actually
+              <span className="text-primary dark:text-[#5DCAA5]">your counter</span> actually
               runs.
             </>
           ) : (
             <>
               Ginawa para sa paraan ng pagtakda{' '}
-              <span className="text-[#5DCAA5]">ng inyong counter</span>.
+              <span className="text-primary dark:text-[#5DCAA5]">ng inyong counter</span>.
             </>
           )}
         </h2>
-        <p className="mt-4 max-w-md text-sm font-light text-[#e8f5ef]/55">
+        <p className="mt-4 max-w-md text-sm font-light text-muted-foreground">
           {isEn
             ? 'No new device to learn. No spreadsheet to babysit. Just the queue, finally in one place.'
             : 'Walang bagong device na dapat matutunan. Walang spreadsheet na bantayan. Ang pila, sa wakas, nasa iisang lugar.'}
         </p>
       </div>
 
-      <ul className="grid grid-cols-1 gap-3 md:grid-cols-3">
+      <ul className="grid grid-cols-1 gap-3.5 md:grid-cols-3">
         {features.map((feature) => (
           <li
             key={feature.title}
-            className="group rounded-xl border border-white/[0.08] bg-white/[0.03] p-5 transition-colors hover:border-white/[0.15] hover:bg-white/[0.05]"
+            className="group rounded-xl border border-border/60 bg-card/80 p-5 shadow-2xs transition-all hover:border-primary/40 hover:bg-card hover:shadow-xs"
           >
             <div className="mb-4 flex items-center gap-3">
               <span
                 aria-hidden="true"
-                className="flex h-[34px] w-[34px] items-center justify-center rounded-lg border border-[#1D9E75]/25 bg-[#1D9E75]/[0.14] text-[#5DCAA5] transition-colors group-hover:border-[#1D9E75]/50 group-hover:text-white"
+                className="flex h-[34px] w-[34px] items-center justify-center rounded-lg border border-primary/30 bg-primary/10 text-primary dark:text-[#5DCAA5] transition-colors group-hover:border-primary group-hover:bg-primary group-hover:text-primary-foreground"
               >
                 <feature.icon className="size-4" />
               </span>
             </div>
 
-            {/* The hairline divider under the title is the one piece of
-                visual rhythm. Without it the three cards read as
-                "icon + heading + body" in identical cadence. */}
-            <h3 className="pb-2.5 text-[13px] font-medium text-[#e8f5ef] border-b border-white/[0.06]">
+            <h3 className="pb-2.5 text-[13px] font-semibold text-foreground border-b border-border/50">
               {feature.title}
             </h3>
-            <p className="mt-2.5 text-[11.5px] font-light leading-relaxed text-[#e8f5ef]/55">
+            <p className="mt-2.5 text-[12px] font-normal leading-relaxed text-muted-foreground">
               {feature.body}
             </p>
           </li>

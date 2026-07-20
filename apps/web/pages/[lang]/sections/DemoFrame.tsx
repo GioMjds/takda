@@ -52,35 +52,33 @@ export function DemoFrame({ lang }: DemoFrameProps) {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-80px' }}
         transition={{ duration: reduceMotion ? 0 : 0.7, ease: [0.22, 1, 0.36, 1] }}
-        className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] shadow-[0_30px_80px_-30px_rgba(0,0,0,0.6)]"
+        className="overflow-hidden rounded-2xl border border-border/70 bg-card/90 shadow-xl backdrop-blur-md transition-colors"
       >
-        {/* Browser chrome — a hairline traffic-light row + URL bar.
-            Visually it reads as "this is a screenshot of the app",
-            which is the entire point of a marketing demo. */}
-        <div className="flex items-center gap-3 border-b border-white/[0.06] bg-white/[0.02] px-4 py-3">
+        {/* Browser chrome */}
+        <div className="flex items-center gap-3 border-b border-border/50 bg-muted/40 px-4 py-3">
           <div className="flex items-center gap-1.5" aria-hidden="true">
-            <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
-            <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
-            <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
+            <span className="h-2.5 w-2.5 rounded-full bg-foreground/20" />
+            <span className="h-2.5 w-2.5 rounded-full bg-foreground/20" />
+            <span className="h-2.5 w-2.5 rounded-full bg-foreground/20" />
           </div>
 
-          <div className="mx-auto flex h-7 w-full max-w-md items-center gap-2 rounded-md border border-white/[0.06] bg-white/[0.02] px-3">
-            <Lock className="size-3 text-white/30" aria-hidden="true" />
-            <span className="truncate font-mono text-[11px] text-white/55">
+          <div className="mx-auto flex h-7 w-full max-w-md items-center gap-2 rounded-md border border-border/60 bg-background/80 px-3">
+            <Lock className="size-3 text-primary/70" aria-hidden="true" />
+            <span className="truncate font-mono text-[11px] text-muted-foreground">
               takda.app/b/josefs-barbershop
             </span>
           </div>
 
           <div className="hidden items-center gap-1.5 sm:flex" aria-hidden="true">
-            <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
-            <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
+            <span className="h-2.5 w-2.5 rounded-full bg-foreground/20" />
+            <span className="h-2.5 w-2.5 rounded-full bg-foreground/20" />
           </div>
         </div>
 
         {/* Split content */}
         <div className="grid grid-cols-1 lg:grid-cols-2">
           {/* ── LEFT: customer booking UI ─────────────────────── */}
-          <div className="border-b border-white/[0.06] p-5 sm:p-7 lg:border-b-0 lg:border-r">
+          <div className="border-b border-border/50 p-5 sm:p-7 lg:border-b-0 lg:border-r">
             <CustomerPanel
               isEn={isEn}
               slotTimes={slotTimes}
@@ -116,32 +114,28 @@ function CustomerPanel({
 }) {
   return (
     <div className="space-y-5">
-      {/* Business header — stylized to match the real customer route's
-          `BusinessHeader` so the demo looks like a screenshot, not a
-          recreation. The badge strip uses the same teal-on-mint recipe
-          as the live component, transposed onto the dark surface. */}
       <header className="flex flex-col items-center text-center">
         <div
-          className="flex h-14 w-14 items-center justify-center rounded-xl border border-white/10 bg-white/[0.05] font-[family-name:var(--font-display)] text-base font-extrabold text-[#5DCAA5]"
+          className="flex h-14 w-14 items-center justify-center rounded-xl border border-primary/30 bg-primary/10 font-[family-name:var(--font-display)] text-base font-extrabold text-primary dark:text-[#5DCAA5]"
           aria-hidden="true"
         >
           JB
         </div>
         <h3
           id="demo-title"
-          className="mt-3 font-[family-name:var(--font-display)] text-lg font-bold text-[#e8f5ef]"
+          className="mt-3 font-[family-name:var(--font-display)] text-lg font-bold text-foreground"
         >
           {isEn ? "Josef's Barbershop" : "Barbershop ni Josef"}
         </h3>
         <div className="mt-2 flex items-center gap-1.5">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-[#1D9E75]/40 bg-[#1D9E75]/15 px-2 py-0.5 text-[10px] font-semibold text-[#5DCAA5]">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/15 px-2.5 py-0.5 text-[10px] font-semibold text-primary dark:text-[#5DCAA5]">
             <span
               aria-hidden="true"
-              className="h-1.5 w-1.5 rounded-full bg-[#1D9E75] shadow-[0_0_8px_1px_rgba(29,158,117,0.6)]"
+              className="h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_8px_1px_rgba(29,158,117,0.6)]"
             />
             {isEn ? 'Open today' : 'Bukás ngayon'}
           </span>
-          <span className="rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-[10px] font-semibold text-white/65">
+          <span className="rounded-full border border-border/60 bg-muted/60 px-2.5 py-0.5 text-[10px] font-semibold text-muted-foreground">
             {isEn ? 'Gupit · 30 min' : 'Gupit · 30 min'}
           </span>
         </div>
@@ -150,11 +144,11 @@ function CustomerPanel({
       {/* Slot grid */}
       <div>
         <div className="mb-2.5 flex items-center justify-between">
-          <p className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/55">
-            <Clock className="size-3 text-[#5DCAA5]" aria-hidden="true" />
+          <p className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+            <Clock className="size-3 text-primary" aria-hidden="true" />
             {isEn ? 'Available times' : 'Mga oras'}
           </p>
-          <p className="font-mono text-[10px] text-white/40">
+          <p className="font-mono text-[10px] text-muted-foreground/70">
             {isEn ? '5 slots left' : '5 slots natitira'}
           </p>
         </div>
@@ -168,7 +162,7 @@ function CustomerPanel({
                 <span
                   key={slot.time}
                   aria-disabled="true"
-                  className="flex h-8 items-center justify-center rounded-md border border-white/[0.04] bg-white/[0.015] font-mono text-[11px] font-medium text-white/25 line-through"
+                  className="flex h-8 items-center justify-center rounded-md border border-border/40 bg-muted/30 font-mono text-[11px] font-medium text-muted-foreground/40 line-through"
                 >
                   {slot.time}
                 </span>
@@ -183,8 +177,8 @@ function CustomerPanel({
                 aria-pressed={isSelected}
                 className={`flex h-8 items-center justify-center rounded-md font-mono text-[11px] font-semibold transition-all ${
                   isSelected
-                    ? 'border border-[#5DCAA5] bg-[#1D9E75] text-white shadow-[0_4px_18px_-6px_rgba(29,158,117,0.7)]'
-                    : 'border border-white/[0.08] bg-white/[0.03] text-[#e8f5ef] hover:border-white/20'
+                    ? 'border border-primary bg-primary text-primary-foreground shadow-sm'
+                    : 'border border-border/60 bg-background text-foreground hover:border-primary/50 hover:bg-muted'
                 }`}
               >
                 {slot.time}
@@ -194,9 +188,7 @@ function CustomerPanel({
         </div>
       </div>
 
-      {/* Contact form — two fields + a primary CTA. Each input is
-          visually identical to the live booking form's chrome,
-          resized to the demo frame. */}
+      {/* Contact form */}
       <div className="space-y-2.5">
         <FormField icon={<User className="size-3.5" />} value={isEn ? 'Maria Santos' : 'Maria Santos'} />
         <FormField
@@ -205,7 +197,7 @@ function CustomerPanel({
         />
         <button
           type="button"
-          className="mt-1 inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-[#1D9E75] text-sm font-semibold text-white transition-colors hover:bg-[#5DCAA5] hover:text-[#0a1f1a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5DCAA5] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1f1a]"
+          className="mt-1 inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-primary text-sm font-semibold text-primary-foreground shadow-sm transition-all hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
         >
           <span>{isEn ? 'Reserve 9:00 AM' : 'I-reserve ang 9:00 AM'}</span>
           <ArrowRight className="size-3.5" aria-hidden="true" />
@@ -217,11 +209,11 @@ function CustomerPanel({
 
 function FormField({ icon, value }: { icon: React.ReactNode; value: string }) {
   return (
-    <div className="flex h-10 items-center gap-2 rounded-lg border border-white/[0.08] bg-white/[0.025] px-3">
-      <span className="text-white/45" aria-hidden="true">
+    <div className="flex h-10 items-center gap-2 rounded-lg border border-border/60 bg-muted/40 px-3">
+      <span className="text-muted-foreground" aria-hidden="true">
         {icon}
       </span>
-      <span className="font-mono text-[12px] text-[#e8f5ef]/85">{value}</span>
+      <span className="font-mono text-[12px] font-medium text-foreground">{value}</span>
     </div>
   );
 }
@@ -231,8 +223,6 @@ function FormField({ icon, value }: { icon: React.ReactNode; value: string }) {
    ──────────────────────────────────────────────────────────────────── */
 
 function OwnerQueuePanel({ isEn, liveCount }: { isEn: boolean; liveCount: number }) {
-  // Queue rows. Hardcoded illustration; the brief specifies three
-  // status kinds. Times are Manila local, monospace.
   const rows: ReadonlyArray<{
     position: number;
     name: string;
@@ -248,43 +238,38 @@ function OwnerQueuePanel({ isEn, liveCount }: { isEn: boolean; liveCount: number
 
   return (
     <div className="space-y-4">
-      {/* Header strip — live count + today counter. The count animates
-          to suggest a websocket subscription. */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="relative flex h-2 w-2" aria-hidden="true">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#1D9E75] opacity-60" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#5DCAA5]" />
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
           </span>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/55">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
             {isEn ? 'Live queue' : 'Live na pila'}
           </p>
         </div>
 
         <div className="flex items-center gap-1.5">
-          <Radio className="size-3 text-[#5DCAA5]" aria-hidden="true" />
-          <span className="font-mono text-[11px] text-white/65">
+          <Radio className="size-3 text-primary" aria-hidden="true" />
+          <span className="font-mono text-[11px] font-semibold text-foreground">
             {liveCount} {isEn ? 'in line' : 'nasa pila'}
           </span>
         </div>
       </div>
 
-      {/* Queue rows */}
-      <ul className="divide-y divide-white/[0.05] rounded-lg border border-white/[0.06] bg-white/[0.015]">
+      <ul className="divide-y divide-border/40 rounded-lg border border-border/60 bg-muted/20">
         {rows.map((row) => (
           <QueueRow key={row.position} {...row} isEn={isEn} />
         ))}
       </ul>
 
-      {/* Footer hint — opens up the demo to a follow-up CTA ("see it
-          live for your business") rather than dead-ending the reader. */}
-      <div className="flex items-center justify-between rounded-lg border border-white/[0.05] bg-white/[0.02] px-3 py-2">
-        <p className="text-[10px] font-medium text-white/50">
+      <div className="flex items-center justify-between rounded-lg border border-border/50 bg-muted/40 px-3 py-2">
+        <p className="text-[10px] font-medium text-muted-foreground">
           {isEn ? 'Updated a moment ago' : 'Na-update kamakailan'}
         </p>
         <button
           type="button"
-          className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#5DCAA5] transition-colors hover:text-white"
+          className="inline-flex items-center gap-1 text-[10px] font-semibold text-primary dark:text-[#5DCAA5] transition-colors hover:underline"
         >
           {isEn ? 'Open full queue' : 'Buksan ang buong pila'}
           <ChevronRight className="size-3" aria-hidden="true" />
@@ -310,15 +295,15 @@ function QueueRow({
   const statusConfig = {
     confirmed: {
       label: isEn ? 'Confirmed' : 'Kumpirmado',
-      cls: 'border-[#1D9E75]/35 bg-[#1D9E75]/15 text-[#5DCAA5]',
+      cls: 'border-primary/40 bg-primary/15 text-primary dark:text-[#5DCAA5]',
     },
     checked_in: {
       label: isEn ? 'Checked in' : 'Nasa counter',
-      cls: 'border-amber-400/35 bg-amber-400/12 text-amber-200',
+      cls: 'border-amber-500/40 bg-amber-500/15 text-amber-800 dark:text-amber-300',
     },
     walk_in: {
       label: isEn ? 'Walk-in' : 'Walk-in',
-      cls: 'border-violet-400/35 bg-violet-400/12 text-violet-200',
+      cls: 'border-violet-500/40 bg-violet-500/15 text-violet-800 dark:text-violet-300',
     },
   } as const;
 
@@ -328,14 +313,14 @@ function QueueRow({
     <li className="flex items-center gap-3 px-3 py-2.5">
       <span
         aria-hidden="true"
-        className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white/[0.04] font-mono text-[10px] font-bold text-white/70"
+        className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-muted font-mono text-[10px] font-bold text-muted-foreground"
       >
         {position}
       </span>
-      <span className="flex-1 truncate text-[12px] font-medium text-[#e8f5ef]/90">
+      <span className="flex-1 truncate text-[12px] font-medium text-foreground">
         {name}
       </span>
-      <span className="hidden font-mono text-[11px] text-white/45 sm:inline">
+      <span className="hidden font-mono text-[11px] text-muted-foreground sm:inline">
         {time}
       </span>
       <span
