@@ -1,56 +1,45 @@
 import { notFound } from 'next/navigation';
 import { getDictionary } from '@/lib/i18n';
 import type { Locale } from '@/lib/i18n';
-import PositionCard from '../../../../../../pages/[lang]/b/[businessSlug]/sections/_PositionCard';
+import PositionCard from '@/views/[lang]/b/[businessSlug]/sections/_PositionCard';
+import {
+  getQueuePosition,
+  decodeQueueTokenClaims,
+} from '@/views/[lang]/b/[businessSlug]/api/_GET';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+/// Turns a business slug into a human-readable title for display. The position
+/// endpoint doesn't return the business name and there's no public
+/// business-detail endpoint yet, so the slug is the best available source.
+function titleFromSlug(slug: string): string {
+  return slug.replace(/-/g, ' ').replace(/\b\w/gu, (l) => l.toUpperCase());
+}
+
+/// Next.js hands search params as `string | string[] | undefined`. This page
+/// only ever expects single values, so collapse arrays to their first entry.
+function firstValue(value: string | string[] | undefined): string | undefined {
+  return Array.isArray(value) ? value[0] : value;
+}
 
 export default async function ConfirmPage({
   params,
   searchParams,
-}: {
-  params: Promise<{ lang: string; businessSlug: string }>;
-  searchParams: Promise<{ booking?: string; token?: string; phone?: string }>;
-}) {
+}: PageProps<'/[lang]/b/[businessSlug]/confirm'>) {
   const { lang, businessSlug } = await params;
-  const { booking: bookingId, token, phone } = await searchParams;
+  const sp = await searchParams;
 
-  if (!bookingId || !token) {
-    notFound();
-  }
+  const bookingId = firstValue(sp.booking);
+  const token = firstValue(sp.token);
+  const phone = firstValue(sp.phone) ?? '';
 
-  let data: any = null;
-  try {
-    const res = await fetch(`${API_BASE}/v1/bookings/${bookingId}/position`, {
-      headers: { Authorization: `Bearer ${token}` },
-      cache: 'no-store',
-    });
+  if (!bookingId || !token) notFound();
 
-    if (res.ok) {
-      data = await res.json();
-    }
-  } catch {
-    // API connection fallback for dev/demo mode
-  }
+  const position = await getQueuePosition(bookingId, token);
 
-  if (!data) {
-    data = {
-      businessId: 'biz_demo',
-      businessName: businessSlug
-        .replace(/-/g, ' ')
-        .replace(/\b\w/g, (l) => l.toUpperCase()),
-      businessAddress: null,
-      position: {
-        bookingId,
-        position: 1,
-        peopleAhead: 0,
-        estimatedWaitMin: 0,
-        slotStart: new Date().toISOString(),
-        status: 'CONFIRMED',
-      },
-      expiresAt: new Date(Date.now() + 86400000).toISOString(),
-    };
-  }
+  // `businessId` (for the live socket) and the token expiry aren't part of the
+  // position payload — read them from the queue token's own claims.
+  const claims = decodeQueueTokenClaims(token);
+  const businessId = claims?.businessId ?? '';
+  const expiresAt = claims ? new Date(claims.exp * 1000).toISOString() : '';
 
   const dict = await getDictionary(lang as Locale);
 
@@ -58,13 +47,14 @@ export default async function ConfirmPage({
     <main className="min-h-screen bg-slate-50 p-4 py-8">
       <PositionCard
         bookingId={bookingId}
-        businessId={data.businessId}
-        businessName={data.businessName}
-        businessAddress={data.businessAddress}
-        initialPosition={data.position}
+        businessId={businessId}
+        businessName={titleFromSlug(businessSlug)}
+        businessAddress={null}
+        initialPosition={position}
         queueToken={token}
-        queueTokenExpiresAt={data.expiresAt}
-        refreshPhone={phone || ''}
+        queueTokenExpiresAt={expiresAt}
+        refreshPhone={phone}
+        lang={lang}
         dict={dict}
       />
     </main>

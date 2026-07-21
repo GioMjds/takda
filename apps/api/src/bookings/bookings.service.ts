@@ -3,6 +3,7 @@ import { ERROR_CODES } from '@takda/shared';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PrismaService } from '../prisma/prisma.service';
 import { QueueTokenService } from '../queue/queue-token.service';
+import { TicketNumberService } from '../queue/ticket-number.service';
 import { CreateBookingInput } from '@takda/shared';
 import { BookingCreatedEvent } from './events/booking-created.event';
 
@@ -12,6 +13,7 @@ export class BookingsService {
     private readonly prisma: PrismaService,
     private readonly eventEmitter: EventEmitter2,
     private readonly queueTokenService: QueueTokenService,
+    private readonly ticketNumberService: TicketNumberService,
   ) {}
 
   async createBooking(businessSlug: string, dto: CreateBookingInput) {
@@ -38,18 +40,31 @@ export class BookingsService {
     const slotStartUtc = new Date(dto.slotStart);
 
     try {
-      const booking = await this.prisma.booking.create({
-        data: {
-          tenantId: business.tenantId,
-          businessId: business.id,
-          serviceId: service.id,
-          slotStart: slotStartUtc,
-          customerName: dto.customerName,
-          customerPhone: dto.customerPhone,
-          notes: dto.notes,
-          status: 'PENDING',
-          source: 'ONLINE',
-        },
+      // Issue the ticket number and create the booking in one transaction so a
+      // number is never burned without a booking (and vice versa).
+      const booking = await this.prisma.$transaction(async (tx) => {
+        const ticketNumber = await this.ticketNumberService.issue(
+          tx,
+          business.id,
+          business.timezone,
+          slotStartUtc,
+        );
+
+        return tx.booking.create({
+          data: {
+            tenantId: business.tenantId,
+            businessId: business.id,
+            serviceId: service.id,
+            slotStart: slotStartUtc,
+            ticketNumber,
+            customerName: dto.customerName,
+            customerPhone: dto.customerPhone,
+            notes: dto.notes,
+            status: 'PENDING',
+            source: 'ONLINE',
+            priorityTier: dto.priorityTier ?? 'STANDARD',
+          },
+        });
       });
 
       const { token, expiresAt } = this.queueTokenService.mintToken({

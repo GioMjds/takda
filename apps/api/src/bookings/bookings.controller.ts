@@ -5,7 +5,7 @@ import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { BookingsService } from './bookings.service';
 import { createBookingSchema, CreateBookingInput } from '@takda/shared';
 
-@Controller('v1/businesses')
+@Controller({ path: 'businesses', version: '1' })
 export class BookingsController {
   constructor(private readonly bookingsService: BookingsService) {}
 

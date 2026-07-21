@@ -60,4 +60,49 @@ describe('queue-position utils', () => {
   it('calculates wait time estimation', () => {
     expect(estimateWaitMin(3, 10)).toBe(30);
   });
+
+  it('sorts a higher priority tier ahead of an earlier slot', () => {
+    // b_vip has a later slot but VIP tier; it should lead the queue.
+    const res = computeQueuePosition({
+      ...baseInput,
+      bookingId: 'b_vip',
+      priorityTier: 'VIP',
+      bookings: [
+        ...baseInput.bookings,
+        {
+          id: 'b_vip',
+          slotStart: '2026-07-20T10:00:00.000Z',
+          createdAt: '2026-07-20T08:20:00.000Z',
+          status: 'CONFIRMED' as const,
+          priorityTier: 'VIP' as const,
+        },
+      ],
+    });
+    expect(res.position).toBe(1);
+    expect(res.peopleAhead).toBe(0);
+    expect(res.priorityTier).toBe('VIP');
+  });
+
+  it('treats SERVING as an active head-of-queue slot', () => {
+    const res = computeQueuePosition({
+      ...baseInput,
+      bookingId: 'b_1',
+      bookings: [
+        {
+          id: 'b_1',
+          slotStart: '2026-07-20T08:30:00.000Z',
+          createdAt: '2026-07-20T08:00:00.000Z',
+          status: 'SERVING' as const,
+        },
+        ...baseInput.bookings.slice(1),
+      ],
+    });
+    expect(res.position).toBe(1);
+    expect(res.status).toBe('SERVING');
+  });
+
+  it('carries ticketNumber through to the result', () => {
+    const res = computeQueuePosition({ ...baseInput, ticketNumber: 42 });
+    expect(res.ticketNumber).toBe(42);
+  });
 });

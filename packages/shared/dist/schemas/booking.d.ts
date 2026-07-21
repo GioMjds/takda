@@ -3,15 +3,40 @@ export declare const bookingStatusSchema: z.ZodEnum<{
     PENDING: "PENDING";
     CONFIRMED: "CONFIRMED";
     CHECKED_IN: "CHECKED_IN";
+    SERVING: "SERVING";
+    COMPLETED: "COMPLETED";
     NO_SHOW: "NO_SHOW";
     CANCELLED: "CANCELLED";
 }>;
+export type BookingStatus = z.infer<typeof bookingStatusSchema>;
+export declare const priorityTierSchema: z.ZodEnum<{
+    VIP: "VIP";
+    PREGNANT: "PREGNANT";
+    PWD: "PWD";
+    SENIOR: "SENIOR";
+    STANDARD: "STANDARD";
+}>;
+export type PriorityTier = z.infer<typeof priorityTierSchema>;
+export declare const PRIORITY_TIER_RANK: Record<PriorityTier, number>;
+export declare const cancelledBySchema: z.ZodEnum<{
+    CUSTOMER: "CUSTOMER";
+    OWNER: "OWNER";
+    SYSTEM: "SYSTEM";
+}>;
+export type CancelledBy = z.infer<typeof cancelledBySchema>;
 export declare const createBookingInputSchema: z.ZodObject<{
     serviceId: z.ZodString;
     slotStart: z.ZodString;
     customerName: z.ZodString;
     customerPhone: z.ZodString;
     notes: z.ZodNullable<z.ZodOptional<z.ZodString>>;
+    priorityTier: z.ZodDefault<z.ZodOptional<z.ZodEnum<{
+        VIP: "VIP";
+        PREGNANT: "PREGNANT";
+        PWD: "PWD";
+        SENIOR: "SENIOR";
+        STANDARD: "STANDARD";
+    }>>>;
 }, z.core.$strip>;
 export declare const createBookingSchema: z.ZodPipe<z.ZodObject<{
     serviceId: z.ZodString;
@@ -19,17 +44,26 @@ export declare const createBookingSchema: z.ZodPipe<z.ZodObject<{
     customerName: z.ZodString;
     customerPhone: z.ZodString;
     notes: z.ZodNullable<z.ZodOptional<z.ZodString>>;
+    priorityTier: z.ZodDefault<z.ZodOptional<z.ZodEnum<{
+        VIP: "VIP";
+        PREGNANT: "PREGNANT";
+        PWD: "PWD";
+        SENIOR: "SENIOR";
+        STANDARD: "STANDARD";
+    }>>>;
 }, z.core.$strip>, z.ZodTransform<{
     customerPhone: string;
     serviceId: string;
     slotStart: string;
     customerName: string;
+    priorityTier: "VIP" | "PREGNANT" | "PWD" | "SENIOR" | "STANDARD";
     notes?: string | null | undefined;
 }, {
     serviceId: string;
     slotStart: string;
     customerName: string;
     customerPhone: string;
+    priorityTier: "VIP" | "PREGNANT" | "PWD" | "SENIOR" | "STANDARD";
     notes?: string | null | undefined;
 }>>;
 export declare const bookingSchema: z.ZodObject<{
@@ -38,6 +72,7 @@ export declare const bookingSchema: z.ZodObject<{
     businessId: z.ZodString;
     serviceId: z.ZodString;
     slotStart: z.ZodCoercedDate<unknown>;
+    ticketNumber: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
     customerName: z.ZodString;
     customerPhone: z.ZodString;
     notes: z.ZodOptional<z.ZodNullable<z.ZodString>>;
@@ -51,11 +86,29 @@ export declare const bookingSchema: z.ZodObject<{
         PENDING: "PENDING";
         CONFIRMED: "CONFIRMED";
         CHECKED_IN: "CHECKED_IN";
+        SERVING: "SERVING";
+        COMPLETED: "COMPLETED";
         NO_SHOW: "NO_SHOW";
         CANCELLED: "CANCELLED";
     }>;
+    priorityTier: z.ZodDefault<z.ZodEnum<{
+        VIP: "VIP";
+        PREGNANT: "PREGNANT";
+        PWD: "PWD";
+        SENIOR: "SENIOR";
+        STANDARD: "STANDARD";
+    }>>;
     idempotencyKey: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     resolvedAt: z.ZodOptional<z.ZodNullable<z.ZodCoercedDate<unknown>>>;
+    servingAt: z.ZodOptional<z.ZodNullable<z.ZodCoercedDate<unknown>>>;
+    recallCount: z.ZodDefault<z.ZodNumber>;
+    completedAt: z.ZodOptional<z.ZodNullable<z.ZodCoercedDate<unknown>>>;
+    cancelledAt: z.ZodOptional<z.ZodNullable<z.ZodCoercedDate<unknown>>>;
+    cancelledBy: z.ZodOptional<z.ZodNullable<z.ZodEnum<{
+        CUSTOMER: "CUSTOMER";
+        OWNER: "OWNER";
+        SYSTEM: "SYSTEM";
+    }>>>;
     createdAt: z.ZodCoercedDate<unknown>;
     updatedAt: z.ZodCoercedDate<unknown>;
 }, z.core.$strip>;
@@ -77,6 +130,7 @@ export declare const queueTokenResponseSchema: z.ZodObject<{
         businessId: z.ZodString;
         serviceId: z.ZodString;
         slotStart: z.ZodCoercedDate<unknown>;
+        ticketNumber: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
         customerName: z.ZodString;
         customerPhone: z.ZodString;
         notes: z.ZodOptional<z.ZodNullable<z.ZodString>>;
@@ -90,11 +144,29 @@ export declare const queueTokenResponseSchema: z.ZodObject<{
             PENDING: "PENDING";
             CONFIRMED: "CONFIRMED";
             CHECKED_IN: "CHECKED_IN";
+            SERVING: "SERVING";
+            COMPLETED: "COMPLETED";
             NO_SHOW: "NO_SHOW";
             CANCELLED: "CANCELLED";
         }>;
+        priorityTier: z.ZodDefault<z.ZodEnum<{
+            VIP: "VIP";
+            PREGNANT: "PREGNANT";
+            PWD: "PWD";
+            SENIOR: "SENIOR";
+            STANDARD: "STANDARD";
+        }>>;
         idempotencyKey: z.ZodOptional<z.ZodNullable<z.ZodString>>;
         resolvedAt: z.ZodOptional<z.ZodNullable<z.ZodCoercedDate<unknown>>>;
+        servingAt: z.ZodOptional<z.ZodNullable<z.ZodCoercedDate<unknown>>>;
+        recallCount: z.ZodDefault<z.ZodNumber>;
+        completedAt: z.ZodOptional<z.ZodNullable<z.ZodCoercedDate<unknown>>>;
+        cancelledAt: z.ZodOptional<z.ZodNullable<z.ZodCoercedDate<unknown>>>;
+        cancelledBy: z.ZodOptional<z.ZodNullable<z.ZodEnum<{
+            CUSTOMER: "CUSTOMER";
+            OWNER: "OWNER";
+            SYSTEM: "SYSTEM";
+        }>>>;
         createdAt: z.ZodCoercedDate<unknown>;
         updatedAt: z.ZodCoercedDate<unknown>;
     }, z.core.$strip>;

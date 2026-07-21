@@ -1,14 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConflictException } from '@nestjs/common';
 import { ERROR_CODES } from '@takda/shared';
-import { QueueController } from '../queue.controller';
+import { QueuePublicController } from '../queue-public.controller';
 import { QueueTokenService } from '../queue-token.service';
+import { QueueService } from '../queue.service';
 import { PrismaService } from '../../prisma/prisma.service';
 
-describe('QueueController', () => {
-  let controller: QueueController;
+describe('QueuePublicController', () => {
+  let controller: QueuePublicController;
   let prisma: any;
   let queueTokenService: any;
+  let queueService: any;
 
   beforeEach(async () => {
     prisma = {
@@ -19,16 +21,20 @@ describe('QueueController', () => {
     queueTokenService = {
       mintToken: jest.fn(),
     };
+    queueService = {
+      computePositionForBooking: jest.fn(),
+    };
 
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [QueueController],
+      controllers: [QueuePublicController],
       providers: [
         { provide: PrismaService, useValue: prisma },
         { provide: QueueTokenService, useValue: queueTokenService },
+        { provide: QueueService, useValue: queueService },
       ],
     }).compile();
 
-    controller = module.get<QueueController>(QueueController);
+    controller = module.get<QueuePublicController>(QueuePublicController);
   });
 
   describe('POST /v1/bookings/:id/queue-token (refreshQueueToken)', () => {

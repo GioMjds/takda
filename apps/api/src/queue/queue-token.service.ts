@@ -11,7 +11,10 @@ export class QueueTokenService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {
-    this.secret = this.configService.get<string>('JWT_SECRET', 'dev-secret-key');
+    this.secret = this.configService.get<string>(
+      'JWT_SECRET',
+      'dev-secret-key',
+    );
   }
 
   mintToken(opts: { bookingId: string; businessId: string }): {

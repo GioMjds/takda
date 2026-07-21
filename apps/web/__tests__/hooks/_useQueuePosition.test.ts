@@ -1,7 +1,7 @@
 import React from 'react';
 import { io } from 'socket.io-client';
 import { refreshQueueToken } from '@/lib/api';
-import { useQueuePosition, UseQueuePositionOptions } from '@/pages/[lang]/b/[businessSlug]/hooks/_useQueuePosition';
+import { useQueuePosition, UseQueuePositionOptions } from '@/views/[lang]/b/[businessSlug]/hooks/_useQueuePosition';
 import type { QueuePosition } from '@takda/shared';
 
 jest.mock('socket.io-client');
@@ -66,6 +66,7 @@ describe('useQueuePosition hook unit tests', () => {
     estimatedWaitMin: 30,
     slotStart: '2026-07-20T09:00:00.000Z',
     status: 'CONFIRMED',
+    priorityTier: 'STANDARD',
   };
 
   const defaultOpts: UseQueuePositionOptions = {

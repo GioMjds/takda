@@ -1,8 +1,8 @@
 import React from 'react';
-import { PositionCard } from '@/pages/[lang]/b/[businessSlug]/sections/_PositionCard';
-import { useQueuePosition } from '@/pages/[lang]/b/[businessSlug]/hooks/_useQueuePosition';
+import { PositionCard } from '@/views/[lang]/b/[businessSlug]/sections/_PositionCard';
+import { useQueuePosition } from '@/views/[lang]/b/[businessSlug]/hooks/_useQueuePosition';
 
-jest.mock('@/pages/[lang]/b/[businessSlug]/hooks/_useQueuePosition');
+jest.mock('@/views/[lang]/b/[businessSlug]/hooks/_useQueuePosition');
 
 describe('PositionCard component unit tests', () => {
   const mockTapToRejoin = jest.fn();
@@ -19,6 +19,7 @@ describe('PositionCard component unit tests', () => {
       estimatedWaitMin: 30,
       slotStart: '2026-07-20T09:00:00.000Z',
       status: 'CONFIRMED' as const,
+      priorityTier: 'STANDARD' as const,
     },
     queueToken: 'test_token_123',
     queueTokenExpiresAt: '2026-07-21T09:00:00.000Z',

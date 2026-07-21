@@ -20,9 +20,7 @@ exports.signupSchema = zod_1.z.object({
         .trim()
         .min(1, 'Email is required')
         .email('Please enter a valid email address'),
-    password: zod_1.z
-        .string()
-        .min(6, 'Password must be at least 6 characters'),
+    password: zod_1.z.string().min(6, 'Password must be at least 6 characters'),
     phone: zod_1.z
         .string()
         .trim()
@@ -57,6 +55,10 @@ exports.verifyOtpSchema = zod_1.z.object({
         .regex(/^\d{6}$/, 'OTP code must consist of 6 numeric digits'),
 });
 exports.refreshTokenSchema = zod_1.z.object({
-    refreshToken: zod_1.z.string().trim().min(1, 'Refresh token is required').optional(),
+    refreshToken: zod_1.z
+        .string()
+        .trim()
+        .min(1, 'Refresh token is required')
+        .optional(),
 });
 //# sourceMappingURL=auth.js.map

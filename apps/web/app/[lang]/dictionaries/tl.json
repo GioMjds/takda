@@ -41,6 +41,7 @@
     "tabs": {
       "queue": "Pila",
       "slots": "Mga Slot",
+      "history": "Kasaysayan",
       "qr": "QR Code",
       "analytics": "Analytics",
       "settings": "Mga Setting"

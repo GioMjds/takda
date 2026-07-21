@@ -237,6 +237,64 @@ CQRS (Command Query Responsibility Segregation) via `@nestjs/cqrs` is appropriat
 
 ---
 
+## 11a. Queue Management (decisions of record)
+
+These decisions are the API contract for issues #15–#25. Change them only
+with a follow-up discussion.
+
+### Ticket numbering (#15)
+
+- Strategy: **daily-resetting, monotonic-per-business** counter. Not
+  per-service (deferred). `Booking.ticketNumber` is the human-readable
+  number owners call out.
+- Assigned **atomically at booking creation** inside the same
+  `prisma.$transaction` as the insert, via `TicketNumberService.issue()`,
+  which upserts-and-increments a `QueueCounter(businessId, businessDate)`
+  row. This is gapless and race-safe (the row is the lock).
+- `businessDate` is the **local calendar date in the business timezone**
+  (see `businessDayBoundsUtc` in `@takda/shared`), so numbering resets at
+  the business's local midnight, not UTC.
+- Nullable on the model so historical rows remain valid; every new booking
+  (online + walk-in) receives one.
+
+### Serving state (#17, #24)
+
+- `SERVING` and `COMPLETED` are **new `BookingStatus` values**, not a
+  separate boolean/field. Rationale: the queue already sorts and filters on
+  `status`; a dedicated status keeps the state machine in one place and the
+  live-queue query trivial.
+- Canonical transitions live in `bookingStateMachine` / `canTransition`
+  (`@takda/shared`):
+  `PENDING → CONFIRMED → SERVING → COMPLETED`, with
+  `PENDING|CONFIRMED|CHECKED_IN → SERVING` (call-next),
+  `CONFIRMED|CHECKED_IN|SERVING → NO_SHOW` (skip),
+  `PENDING|CONFIRMED|CHECKED_IN|SERVING → CANCELLED`.
+  `COMPLETED|NO_SHOW|CANCELLED` are terminal.
+- **One `SERVING` booking per business** at a time (v1, single counter).
+  `callNext` rejects with `QUEUE_ALREADY_SERVING` if someone is still at the
+  counter; `complete`/`skip` clear it. `callNext` on an empty queue returns
+  `null` (200, `{ booking: null }`), never a 500.
+- Timestamps: `servingAt`, `completedAt`, `cancelledAt` (+ `cancelledBy`),
+  `recallCount`. `resolvedAt` is set on every terminal transition.
+
+### Prioritization (#18)
+
+- `PriorityTier` enum, highest-first: `VIP, PREGNANT, PWD, SENIOR, STANDARD`.
+  Rank map is `PRIORITY_TIER_RANK` in `@takda/shared` (lower = sooner).
+- Queue ordering is **tier rank, then `slotStart`, then `createdAt`** —
+  identical in the shared `computeQueuePosition` sort and in Prisma
+  `orderBy` (the enum is declared in rank order so `priorityTier: 'asc'`
+  matches). Keep these two in sync if the enum changes.
+
+### Owner queue API surface
+
+All under `POST/GET /v1/businesses/:businessId/queue/*`, JWT-guarded +
+`@Roles`, and `QueueAdminService` re-checks business membership so a token
+for one business cannot mutate another's queue. Broadcasts go out via the
+existing `booking.changed` event plus a new `queue.head.changed` event.
+
+---
+
 ## 12. Notifications (SMS)
 
 - `NotificationsService` abstracts provider integration (`SMS_PROVIDER`). Supported adapters: Semaphore (PH) and Twilio PH.

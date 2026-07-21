@@ -2,10 +2,8 @@ import { getDictionary } from '@/lib/i18n';
 import type { Locale } from '@/lib/i18n';
 
 export default async function SettingsPage({
-  params,
-}: {
-  params: Promise<{ lang: string }>;
-}) {
+  params
+}: PageProps<'/[lang]/dashboard/settings'>) {
   const { lang } = await params;
   const dict = await getDictionary(lang as Locale);
 
@@ -87,7 +85,9 @@ export default async function SettingsPage({
 
           <div className="space-y-4 pt-4">
             <h3 className="font-bold text-[#0d4f43] text-lg border-b border-[#a8ddd4]/25 pb-2">
-              {lang === 'en' ? 'SMS Notification Preferences' : 'Mga Kagustuhan sa SMS Notification'}
+              {lang === 'en'
+                ? 'SMS Notification Preferences'
+                : 'Mga Kagustuhan sa SMS Notification'}
             </h3>
 
             <div className="space-y-4">
@@ -101,8 +101,13 @@ export default async function SettingsPage({
                   className="mt-1 h-4.5 w-4.5 text-[#1a8c75] border-[#a8ddd4] rounded focus:ring-[#1a8c75]"
                 />
                 <div>
-                  <label htmlFor="enableSms" className="text-sm font-bold text-[#0d4f43]">
-                    {lang === 'en' ? 'Enable Automatic Reminders' : 'I-enable ang Awtomatikong Reminders'}
+                  <label
+                    htmlFor="enableSms"
+                    className="text-sm font-bold text-[#0d4f43]"
+                  >
+                    {lang === 'en'
+                      ? 'Enable Automatic Reminders'
+                      : 'I-enable ang Awtomatikong Reminders'}
                   </label>
                   <p className="text-xs text-[#0d4f43]/70 font-medium">
                     {lang === 'en'
@@ -114,8 +119,13 @@ export default async function SettingsPage({
 
               {/* Time buffer select */}
               <div>
-                <label htmlFor="smsBuffer" className="block text-sm font-semibold text-[#0d4f43]">
-                  {lang === 'en' ? 'Send Reminder Buffer' : 'Oras Bago Ipadala ang Reminder'}
+                <label
+                  htmlFor="smsBuffer"
+                  className="block text-sm font-semibold text-[#0d4f43]"
+                >
+                  {lang === 'en'
+                    ? 'Send Reminder Buffer'
+                    : 'Oras Bago Ipadala ang Reminder'}
                 </label>
                 <select
                   id="smsBuffer"
@@ -123,17 +133,30 @@ export default async function SettingsPage({
                   defaultValue="15"
                   className="mt-1 block w-full md:w-1/2 px-3 py-2.5 bg-white border border-[#a8ddd4] rounded-lg text-sm text-[#0d4f43] focus:outline-none focus:ring-2 focus:ring-[#1a8c75] transition"
                 >
-                  <option value="5">5 {lang === 'en' ? 'minutes before' : 'minuto bago'}</option>
-                  <option value="10">10 {lang === 'en' ? 'minutes before' : 'minuto bago'}</option>
-                  <option value="15">15 {lang === 'en' ? 'minutes before' : 'minuto bago'}</option>
-                  <option value="30">30 {lang === 'en' ? 'minutes before' : 'minuto bago'}</option>
+                  <option value="5">
+                    5 {lang === 'en' ? 'minutes before' : 'minuto bago'}
+                  </option>
+                  <option value="10">
+                    10 {lang === 'en' ? 'minutes before' : 'minuto bago'}
+                  </option>
+                  <option value="15">
+                    15 {lang === 'en' ? 'minutes before' : 'minuto bago'}
+                  </option>
+                  <option value="30">
+                    30 {lang === 'en' ? 'minutes before' : 'minuto bago'}
+                  </option>
                 </select>
               </div>
 
               {/* Template field */}
               <div>
-                <label htmlFor="smsTemplate" className="block text-sm font-semibold text-[#0d4f43]">
-                  {lang === 'en' ? 'SMS Message Template' : 'Template ng Mensahe sa SMS'}
+                <label
+                  htmlFor="smsTemplate"
+                  className="block text-sm font-semibold text-[#0d4f43]"
+                >
+                  {lang === 'en'
+                    ? 'SMS Message Template'
+                    : 'Template ng Mensahe sa SMS'}
                 </label>
                 <textarea
                   id="smsTemplate"

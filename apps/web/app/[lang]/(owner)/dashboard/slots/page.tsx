@@ -3,9 +3,7 @@ import type { Locale } from '@/lib/i18n';
 
 export default async function SlotsConfigPage({
   params,
-}: {
-  params: Promise<{ lang: string }>;
-}) {
+}: PageProps<'/[lang]/dashboard/slots'>) {
   const { lang } = await params;
   const dict = await getDictionary(lang as Locale);
 
@@ -94,9 +92,15 @@ export default async function SlotsConfigPage({
                 className="mt-1 block w-full px-3 py-2.5 bg-white border border-[#a8ddd4] rounded-lg text-sm text-[#0d4f43] focus:outline-none focus:ring-2 focus:ring-[#1a8c75] transition"
               >
                 <option value="5">5 {lang === 'en' ? 'mins' : 'minuto'}</option>
-                <option value="10">10 {lang === 'en' ? 'mins' : 'minuto'}</option>
-                <option value="15">15 {lang === 'en' ? 'mins' : 'minuto'}</option>
-                <option value="30">30 {lang === 'en' ? 'mins' : 'minuto'}</option>
+                <option value="10">
+                  10 {lang === 'en' ? 'mins' : 'minuto'}
+                </option>
+                <option value="15">
+                  15 {lang === 'en' ? 'mins' : 'minuto'}
+                </option>
+                <option value="30">
+                  30 {lang === 'en' ? 'mins' : 'minuto'}
+                </option>
                 <option value="60">1 {lang === 'en' ? 'hour' : 'oras'}</option>
               </select>
             </div>

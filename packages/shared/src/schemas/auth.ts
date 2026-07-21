@@ -21,18 +21,22 @@ export const signupSchema = z.object({
     .trim()
     .min(1, 'Email is required')
     .email('Please enter a valid email address'),
-  password: z
-    .string()
-    .min(6, 'Password must be at least 6 characters'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
   phone: z
     .string()
     .trim()
-    .regex(/^\+?[1-9]\d{1,14}$/, 'Phone number must be valid E.164 format (e.g. +639171234567)'),
+    .regex(
+      /^\+?[1-9]\d{1,14}$/,
+      'Phone number must be valid E.164 format (e.g. +639171234567)',
+    ),
   tenantSlug: z
     .string()
     .trim()
     .min(2, 'Tenant slug must be at least 2 characters')
-    .regex(/^[a-z0-9-]+$/, 'Slug may only contain lowercase alphanumeric characters and hyphens')
+    .regex(
+      /^[a-z0-9-]+$/,
+      'Slug may only contain lowercase alphanumeric characters and hyphens',
+    )
     .optional(),
   businessName: z
     .string()
@@ -47,7 +51,10 @@ export const requestOtpSchema = z.object({
   phone: z
     .string()
     .trim()
-    .regex(/^\+?[1-9]\d{1,14}$/, 'Phone number must be valid E.164 format (e.g. +639171234567)'),
+    .regex(
+      /^\+?[1-9]\d{1,14}$/,
+      'Phone number must be valid E.164 format (e.g. +639171234567)',
+    ),
 });
 
 export type RequestOtpInput = z.infer<typeof requestOtpSchema>;
@@ -56,7 +63,10 @@ export const verifyOtpSchema = z.object({
   phone: z
     .string()
     .trim()
-    .regex(/^\+?[1-9]\d{1,14}$/, 'Phone number must be valid E.164 format (e.g. +639171234567)'),
+    .regex(
+      /^\+?[1-9]\d{1,14}$/,
+      'Phone number must be valid E.164 format (e.g. +639171234567)',
+    ),
   code: z
     .string()
     .trim()
@@ -67,7 +77,11 @@ export const verifyOtpSchema = z.object({
 export type VerifyOtpInput = z.infer<typeof verifyOtpSchema>;
 
 export const refreshTokenSchema = z.object({
-  refreshToken: z.string().trim().min(1, 'Refresh token is required').optional(),
+  refreshToken: z
+    .string()
+    .trim()
+    .min(1, 'Refresh token is required')
+    .optional(),
 });
 
 export type RefreshTokenInput = z.infer<typeof refreshTokenSchema>;

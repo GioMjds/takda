@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { LoginView } from '@/pages/[lang]/login/_index';
+import { LoginView } from '@/views/[lang]/login/_index';
 import { getDictionary } from '@/lib/i18n';
 import type { Locale } from '@/lib/i18n';
 

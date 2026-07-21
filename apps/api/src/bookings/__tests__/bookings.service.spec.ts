@@ -4,21 +4,25 @@ import { NotFoundException, ConflictException } from '@nestjs/common';
 import { BookingsService } from '../bookings.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { QueueTokenService } from '../../queue/queue-token.service';
+import { TicketNumberService } from '../../queue/ticket-number.service';
 
 describe('BookingsService', () => {
   let service: BookingsService;
   let prisma: any;
   let eventEmitter: any;
   let tokenService: any;
+  let ticketNumberService: any;
 
   beforeEach(async () => {
     prisma = {
       business: { findFirst: jest.fn() },
       service: { findUnique: jest.fn() },
       booking: { create: jest.fn() },
+      $transaction: jest.fn(async (cb: any) => cb(prisma)),
     };
     eventEmitter = { emit: jest.fn() };
     tokenService = { mintToken: jest.fn() };
+    ticketNumberService = { issue: jest.fn().mockResolvedValue(1) };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -26,6 +30,7 @@ describe('BookingsService', () => {
         { provide: PrismaService, useValue: prisma },
         { provide: EventEmitter2, useValue: eventEmitter },
         { provide: QueueTokenService, useValue: tokenService },
+        { provide: TicketNumberService, useValue: ticketNumberService },
       ],
     }).compile();
 
@@ -33,8 +38,18 @@ describe('BookingsService', () => {
   });
 
   it('creates a booking, mints token, and emits BookingCreatedEvent', async () => {
-    prisma.business.findFirst.mockResolvedValue({ id: 'biz_1', tenantId: 't_1', slug: 'test-biz' });
-    prisma.service.findUnique.mockResolvedValue({ id: 'srv_1', businessId: 'biz_1', durationMin: 15, isActive: true });
+    prisma.business.findFirst.mockResolvedValue({
+      id: 'biz_1',
+      tenantId: 't_1',
+      slug: 'test-biz',
+      timezone: 'Asia/Manila',
+    });
+    prisma.service.findUnique.mockResolvedValue({
+      id: 'srv_1',
+      businessId: 'biz_1',
+      durationMin: 15,
+      isActive: true,
+    });
     const mockBooking = {
       id: 'b_1',
       tenantId: 't_1',
@@ -65,9 +80,14 @@ describe('BookingsService', () => {
     expect(result.queueToken).toBe('jwt_token_123');
     expect(result.queueTokenExpiresAt).toBe('2026-07-21T09:00:00.000Z');
     expect(result.booking.id).toBe('b_1');
+    expect(ticketNumberService.issue).toHaveBeenCalled();
     expect(eventEmitter.emit).toHaveBeenCalledWith(
       'booking.created',
-      expect.objectContaining({ bookingId: 'b_1', businessId: 'biz_1', serviceId: 'srv_1' }),
+      expect.objectContaining({
+        bookingId: 'b_1',
+        businessId: 'biz_1',
+        serviceId: 'srv_1',
+      }),
     );
   });
 
@@ -85,7 +105,12 @@ describe('BookingsService', () => {
   });
 
   it('throws NotFoundException when service is not found or belongs to another business', async () => {
-    prisma.business.findFirst.mockResolvedValue({ id: 'biz_1', tenantId: 't_1', slug: 'test-biz' });
+    prisma.business.findFirst.mockResolvedValue({
+      id: 'biz_1',
+      tenantId: 't_1',
+      slug: 'test-biz',
+      timezone: 'Asia/Manila',
+    });
     prisma.service.findUnique.mockResolvedValue(null);
 
     await expect(
@@ -99,8 +124,18 @@ describe('BookingsService', () => {
   });
 
   it('throws ConflictException when slot is already taken (P2002)', async () => {
-    prisma.business.findFirst.mockResolvedValue({ id: 'biz_1', tenantId: 't_1', slug: 'test-biz' });
-    prisma.service.findUnique.mockResolvedValue({ id: 'srv_1', businessId: 'biz_1', durationMin: 15, isActive: true });
+    prisma.business.findFirst.mockResolvedValue({
+      id: 'biz_1',
+      tenantId: 't_1',
+      slug: 'test-biz',
+      timezone: 'Asia/Manila',
+    });
+    prisma.service.findUnique.mockResolvedValue({
+      id: 'srv_1',
+      businessId: 'biz_1',
+      durationMin: 15,
+      isActive: true,
+    });
     prisma.booking.create.mockRejectedValue({ code: 'P2002' });
 
     await expect(
