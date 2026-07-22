@@ -44,6 +44,7 @@ model User {
   tenant        Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   memberships   Membership[]
   refreshTokens RefreshToken[]
+  staffInvites  StaffInvite[]  @relation("InvitedBy")
 
   @@unique([tenantId, email])
   @@index([tenantId])
@@ -100,14 +101,15 @@ model Business {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  tenant      Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  services    Service[]
-  bookings    Booking[]
-  memberships Membership[]
-  reminders   Reminder[]
-  messages    Message[]
-  overrides   DayOverride[]
-  branched    Branch[]
+  tenant       Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  services     Service[]
+  bookings     Booking[]
+  memberships  Membership[]
+  reminders    Reminder[]
+  messages     Message[]
+  overrides    DayOverride[]
+  branched     Branch[]
+  staffInvites StaffInvite[]
 
   @@unique([tenantId, slug])
   @@index([tenantId])
@@ -400,6 +402,25 @@ model Branch {
 
   @@unique([businessId, name])
   @@index([businessId])
+}
+
+model StaffInvite {
+  id          String         @id @default(cuid())
+  businessId  String
+  email       String
+  role        MembershipRole
+  tokenHash   String         @unique
+  invitedById String
+  expiresAt   DateTime
+  acceptedAt  DateTime?
+  revokedAt   DateTime?
+  createdAt   DateTime       @default(now())
+
+  business  Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  invitedBy User     @relation("InvitedBy", fields: [invitedById], references: [id])
+
+  @@index([businessId, email])
+  @@index([expiresAt])
 }
 
 // -----------------------------------------------------------------------------

@@ -300,4 +300,76 @@ export class EmployeesService {
       });
     });
   }
+
+  // Staff Membership System business logics
+  async createMembershipFromInvite(
+    tx: PrismaClientLike,
+    businessId: string,
+    tenantId: string,
+    email: string,
+    role: MembershipRole,
+    dto: { name?: string; password?: string },
+  ) {
+    let targetUserId: string;
+
+    const existingUser = await tx.user.findUnique({
+      where: {
+        tenantId_email: {
+          tenantId,
+          email,
+        },
+      },
+    });
+
+    if (existingUser) {
+      targetUserId = existingUser.id;
+    } else {
+      if (!dto.name || !dto.password) {
+        throw new ConflictException({
+          code: ERROR_CODES.VALIDATION_ERROR,
+          message: 'Name and password are required for new staff accounts.',
+        });
+      }
+
+      const passwordHash = await bcrypt.hash(dto.password, 10);
+      const newUser = await tx.user.create({
+        data: {
+          tenantId,
+          email,
+          name: dto.name,
+          passwordHash,
+          role: 'STAFF',
+        },
+      });
+      targetUserId = newUser.id;
+    }
+
+    const existingMembership = await tx.membership.findFirst({
+      where: { businessId, userId: targetUserId },
+    });
+
+    if (existingMembership) {
+      throw new ConflictException({
+        code: ERROR_CODES.EMPLOYEE_ALREADY_EXISTS,
+        message: 'User is already a member of this business.',
+      });
+    }
+
+    return tx.membership.create({
+      data: {
+        businessId,
+        userId: targetUserId,
+        role,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+  }
 }
