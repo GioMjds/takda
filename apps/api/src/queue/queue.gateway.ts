@@ -62,9 +62,7 @@ export class QueueGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  handleDisconnect() {
-    // Rooms are automatically cleaned up by Socket.IO
-  }
+  handleDisconnect() {}
 
   @OnEvent('booking.created')
   async handleBookingCreated(event: BookingCreatedEvent) {

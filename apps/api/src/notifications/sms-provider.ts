@@ -30,7 +30,11 @@ export class SemaphoreSmsProvider implements SmsProvider {
 
   async send(toPhone: string, body: string): Promise<SmsSendResult> {
     if (!ENV.SMS_API_KEY) {
-      return { providerMessageId: null, accepted: false, error: 'SMS_API_KEY not set' };
+      return {
+        providerMessageId: null,
+        accepted: false,
+        error: 'SMS_API_KEY not set',
+      };
     }
 
     try {
@@ -83,7 +87,11 @@ export class TwilioSmsProvider implements SmsProvider {
     }
 
     try {
-      const params = new URLSearchParams({ To: toPhone, From: from, Body: body });
+      const params = new URLSearchParams({
+        To: toPhone,
+        From: from,
+        Body: body,
+      });
       const res = await fetch(
         `https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`,
         {

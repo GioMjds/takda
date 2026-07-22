@@ -1,9 +1,3 @@
-/// SMS body templates for queue-lifecycle notifications. Kept intentionally
-/// short — Semaphore/Twilio bill per 160-char segment. Each template maps to a
-/// stable id persisted on Message.templateId for audit / replay.
-///
-/// Variables are simple `{name}` placeholders resolved by `renderTemplate`.
-
 export type SmsTemplateId =
   | 'queue.confirmed'
   | 'queue.you_are_next'

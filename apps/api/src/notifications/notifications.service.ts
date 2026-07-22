@@ -22,10 +22,6 @@ export class NotificationsService {
     @Inject(SMS_PROVIDER) private readonly sms: SmsProvider,
   ) {}
 
-  /// Renders the template, persists a Message row (PENDING), dispatches via the
-  /// configured provider, then records the outcome. Never throws — SMS is a
-  /// side-effect of queue actions and must not roll back or block them. Returns
-  /// the persisted Message id.
   async sendSms(args: SendSmsArgs): Promise<string | null> {
     const toPhone = normalizePhone(args.toPhone);
     const body = renderSmsTemplate(args.templateId, args.vars);
