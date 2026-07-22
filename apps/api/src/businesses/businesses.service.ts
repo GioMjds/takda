@@ -8,7 +8,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateBusinessInput,
   UpdateBusinessInput,
-  ListBusinessQuery,
+  ListBusinessesQuery,
   ERROR_CODES,
 } from '@takda/shared';
 import { Business } from '@prisma/client';
@@ -63,7 +63,10 @@ export class BusinessesService {
     });
   }
 
-  async findAll(userId: string, query: ListBusinessQuery): Promise<Business[]> {
+  async findAll(
+    userId: string,
+    query: ListBusinessesQuery,
+  ): Promise<Business[]> {
     const limit = query.limit ?? 20;
     const offset = query.offset ?? 0;
 
@@ -171,10 +174,7 @@ export class BusinessesService {
     });
   }
 
-  async softDelete(
-    idOrSlug: string,
-    userId: string,
-  ): Promise<Business> {
+  async softDelete(idOrSlug: string, userId: string): Promise<Business> {
     const business = await this.prisma.business.findFirst({
       where: {
         OR: [{ id: idOrSlug }, { slug: idOrSlug }],

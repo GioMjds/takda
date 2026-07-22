@@ -39,6 +39,6 @@ export const listBusinessQuerySchema = z.object({
 
 export type CreateBusinessInput = z.infer<typeof createBusinessInputSchema>;
 export type UpdateBusinessInput = z.infer<typeof updateBusinessInputSchema>;
-export type ListBusinessQuery = z.infer<typeof listBusinessQuerySchema>;
+export type ListBusinessesQuery = z.infer<typeof listBusinessQuerySchema>;
 
 export type Business = z.infer<typeof businessSchema>;
