@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import {
+  businessDayBoundsUtc,
   computeQueuePosition,
   countActiveForBusiness,
   ERROR_CODES,
@@ -25,11 +26,10 @@ export class QueueService {
       });
     }
 
-    const slotDate = new Date(booking.slotStart);
-    const startOfDay = new Date(slotDate);
-    startOfDay.setUTCHours(0, 0, 0, 0);
-    const endOfDay = new Date(slotDate);
-    endOfDay.setUTCHours(23, 59, 59, 999);
+    const { startUtc: startOfDay, endUtc: endOfDay } = businessDayBoundsUtc(
+      new Date(booking.slotStart),
+      booking.business.timezone,
+    );
 
     const dayBookings = await this.prisma.booking.findMany({
       where: {
@@ -41,6 +41,7 @@ export class QueueService {
         slotStart: true,
         createdAt: true,
         status: true,
+        priorityTier: true,
       },
     });
 
@@ -49,11 +50,14 @@ export class QueueService {
       bookingId: booking.id,
       slotStart: booking.slotStart.toISOString(),
       serviceDurationMin: booking.service.durationMin,
+      ticketNumber: booking.ticketNumber,
+      priorityTier: booking.priorityTier,
       bookings: dayBookings.map((b) => ({
         id: b.id,
         slotStart: b.slotStart.toISOString(),
         createdAt: b.createdAt.toISOString(),
         status: b.status,
+        priorityTier: b.priorityTier,
       })),
       businessDayStartUtc: startOfDay.toISOString(),
       businessDayEndUtc: endOfDay.toISOString(),
@@ -61,11 +65,16 @@ export class QueueService {
   }
 
   async computeSnapshot(businessId: string): Promise<QueueSnapshot> {
-    const now = new Date();
-    const startOfDay = new Date(now);
-    startOfDay.setUTCHours(0, 0, 0, 0);
-    const endOfDay = new Date(now);
-    endOfDay.setUTCHours(23, 59, 59, 999);
+    const business = await this.prisma.business.findUnique({
+      where: { id: businessId },
+      select: { timezone: true },
+    });
+    const timezone = business?.timezone ?? 'Asia/Manila';
+
+    const { startUtc: startOfDay, endUtc: endOfDay } = businessDayBoundsUtc(
+      new Date(),
+      timezone,
+    );
 
     const bookings = await this.prisma.booking.findMany({
       where: {

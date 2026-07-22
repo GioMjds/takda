@@ -28,7 +28,21 @@ const envSchema = z.object({
     .default(60 * 60 * 24 * 30), // 30 days
 
   SMS_PROVIDER: z.enum(['semaphore', 'twilio']).default('semaphore'),
-  SMS_API_KEY: z.string().optional(), // required when SMS_PROVIDER is set in non-test envs
+  SMS_API_KEY: z.string().optional(), // Semaphore API key; required to actually send.
+  // Master switch. When false (default outside production) messages are
+  // persisted and logged but not dispatched to the provider — keeps dev/test
+  // from spending SMS credits or requiring network access.
+  SMS_ENABLED: z
+    .enum(['true', 'false'])
+    .default('false')
+    .transform((v) => v === 'true'),
+  // Semaphore: registered sender name (defaults to the account's assigned name).
+  SMS_SENDER_NAME: z.string().optional(),
+  SMS_SEMAPHORE_BASE_URL: z.url().default('https://api.semaphore.co/api/v4'),
+  // Twilio.
+  SMS_TWILIO_ACCOUNT_SID: z.string().optional(),
+  SMS_TWILIO_AUTH_TOKEN: z.string().optional(),
+  SMS_TWILIO_FROM: z.string().optional(), // E.164 sender number.
 
   CORS_ORIGINS: z.string().default('http://localhost:3000'),
 });

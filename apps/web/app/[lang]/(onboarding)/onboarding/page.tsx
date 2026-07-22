@@ -5,9 +5,7 @@ import type { Route } from 'next';
 
 export default async function OnboardingPage({
   params,
-}: {
-  params: Promise<{ lang: string }>;
-}) {
+}: PageProps<'/[lang]/onboarding'>) {
   const { lang } = await params;
   const dict = await getDictionary(lang as Locale);
 

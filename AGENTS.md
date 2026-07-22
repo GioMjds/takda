@@ -141,19 +141,20 @@ A change is "done" only when **all** of these are true:
 
 ### 4.6 Next.js (App Router) & Web Architecture
 
-- **Separation of Concerns via `apps/web/pages/<route-name>`**: Next.js App Router routing files (`page.tsx`, `layout.tsx`, `template.tsx`) in `apps/web/app/` should remain thin wrappers that import their core presentation and state components from `apps/web/pages/<route-name>/`.
-  - Inside `apps/web/pages/<route-name>/`, structure directories as:
+- **Separation of Concerns via `apps/web/views/<route-name>`**: Next.js App Router routing files (`page.tsx`, `layout.tsx`, `template.tsx`) in `apps/web/app/` should remain thin wrappers that import their core presentation and state components from `apps/web/views/<route-name>/`.
+  - **Why `views/` and not `pages/`**: Next.js reserves a workspace-root `pages/` directory for the legacy Pages Router and turns every non-underscore file inside it into a route — which collides head-on with the App Router in `app/`. This presentation layer is therefore named `views/`. Do not name it `pages/`.
+  - Inside `apps/web/views/<route-name>/`, structure directories as:
     - `hooks/`: Page-specific custom hooks (e.g., form handlers, RHF setup, state hooks).
     - `api/`: API call files incorporating `apps/web/configs/fetch.ts`, named after the HTTP method (e.g., `GET.ts`, `POST.ts`, `PUT.ts`, `DELETE.ts`).
     - `sections/`: UI layout sections and sub-components specific to this route.
     - `index.ts`: Barrel file exporting views, custom hooks, and sections.
-  - Map route paths declared in `apps/web/app` to their `pages` equivalent:
-    - `app/[lang]/page.tsx` $\rightarrow$ `pages/[lang]/`
-    - `app/[lang]/(auth)/login/page.tsx` $\rightarrow$ `pages/[lang]/login/`
-    - `app/[lang]/(customer)/b/[businessSlug]/page.tsx` $\rightarrow$ `pages/[lang]/b/[businessSlug]/`
-    - `app/[lang]/(customer)/b/[businessSlug]/confirm/page.tsx` $\rightarrow$ `pages/[lang]/b/[businessSlug]/confirm/`
-    - `app/[lang]/(onboarding)/onboarding/page.tsx` $\rightarrow$ `pages/[lang]/onboarding/`
-    - `app/[lang]/(owner)/dashboard/page.tsx` $\rightarrow$ `pages/[lang]/dashboard/`
+  - Map route paths declared in `apps/web/app` to their `views` equivalent:
+    - `app/[lang]/page.tsx` $\rightarrow$ `views/[lang]/`
+    - `app/[lang]/(auth)/login/page.tsx` $\rightarrow$ `views/[lang]/login/`
+    - `app/[lang]/(customer)/b/[businessSlug]/page.tsx` $\rightarrow$ `views/[lang]/b/[businessSlug]/`
+    - `app/[lang]/(customer)/b/[businessSlug]/confirm/page.tsx` $\rightarrow$ `views/[lang]/b/[businessSlug]/confirm/`
+    - `app/[lang]/(onboarding)/onboarding/page.tsx` $\rightarrow$ `views/[lang]/onboarding/`
+    - `app/[lang]/(owner)/dashboard/page.tsx` $\rightarrow$ `views/[lang]/dashboard/`
 
 - **Typecheck & Typed Routes**: Always run typecheck (`pnpm typecheck` inside `apps/web`) to validate typed routes and link path correctness.
 
@@ -208,10 +209,10 @@ A change is "done" only when **all** of these are true:
   - `'use client'`: Mark files containing hooks (`useState`, `useEffect`), event handlers, browser APIs, or animation libraries (e.g., `motion`).
   - `'use server'`: Restrict only to files or functions serving as entry points for Server Actions. Do not mix server actions inside client component files.
   - `'use cache'`: Utilize at database query or expensive calculation boundaries to cache server-rendered properties.
-  - **Server-Side vs. Client-Side Page Components**: To ensure maximum SEO indexability and fast page loads, the main route page (`page.tsx`) and the top-level route barrel file (`pages/<route-name>/index.ts`) must remain **Server Components** by default.
+  - **Server-Side vs. Client-Side Page Components**: To ensure maximum SEO indexability and fast page loads, the main route page (`page.tsx`) and the top-level route barrel file (`views/<route-name>/index.ts`) must remain **Server Components** by default.
   - **Integrating Animations & Transitions**: If a page requires transitions, page entrance animations, or hover micro-interactions via `motion`:
     - Do not mark the entire page as a Client Component.
-    - Encapsulate the animated portions inside specific child components within `pages/<route-name>/sections/` and mark _only_ those sub-components with `'use client'`.
+    - Encapsulate the animated portions inside specific child components within `views/<route-name>/sections/` and mark _only_ those sub-components with `'use client'`.
     - Import these animated sub-components back into the parent Server Component. This retains the semantic SEO structure on the initial server render while cleanly applying client-side animations after hydration.
 
 ---

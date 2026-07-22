@@ -3,7 +3,7 @@ import { businessSlugSchema } from '@takda/shared';
 import type { Business, Service, Slot } from '@takda/shared';
 import { getDictionary } from '@/lib/i18n';
 import type { Locale } from '@/lib/i18n';
-import CustomerBookingView from '@/pages/[lang]/b/[businessSlug]/_CustomerBookingView';
+import CustomerBookingView from '@/views/[lang]/b/[businessSlug]/_CustomerBookingView';
 import { http } from '@/configs/fetch';
 
 // Local Mock Data for fallback and preview capability

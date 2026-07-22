@@ -3,6 +3,22 @@
 import React from 'react';
 import type { QueuePosition } from '@takda/shared';
 import { useQueuePosition } from '../hooks/_useQueuePosition';
+import { TicketQr } from './_TicketQr';
+
+/// Copy keys the card renders. Every field is optional because callers may pass
+/// a partial or entirely absent dictionary; a full English fallback is applied
+/// at render time.
+export interface PositionCardDict {
+  yourSlot?: string;
+  yourNumber?: string;
+  estimatedWait?: string;
+  peopleAhead?: string;
+  youAreNext?: string;
+  reconnecting?: string;
+  expired?: string;
+  tapToRejoin?: string;
+  terminalState?: string;
+}
 
 export interface PositionCardProps {
   bookingId: string;
@@ -13,14 +29,13 @@ export interface PositionCardProps {
   queueToken: string;
   queueTokenExpiresAt: string;
   refreshPhone: string;
-  dict: any;
+  lang?: string;
+  /// The active locale dictionary. Only `positionCard` is read here; typed
+  /// loosely so the full app dictionary satisfies it without a cast.
+  dict?: { positionCard?: PositionCardDict } | null;
 }
 
 export function PositionCard(props: PositionCardProps) {
-  if (!props || !props.initialPosition) {
-    return null;
-  }
-
   const { position, totalActive, status, onTapToRejoin } = useQueuePosition({
     bookingId: props.bookingId,
     businessId: props.businessId,
@@ -29,8 +44,14 @@ export function PositionCard(props: PositionCardProps) {
     refreshPhone: props.refreshPhone,
   });
 
+  // Defensive guard for callers that render the card before a position is
+  // available. Kept after the hook so hook order stays stable across renders.
+  if (!props.initialPosition) {
+    return null;
+  }
+
   const activePos = position ?? props.initialPosition;
-  const t = props.dict?.positionCard || {
+  const t: Required<PositionCardDict> = {
     yourSlot: 'Your Slot',
     yourNumber: 'Your Queue Number',
     estimatedWait: 'Estimated Wait',
@@ -40,6 +61,7 @@ export function PositionCard(props: PositionCardProps) {
     expired: 'Session expired',
     tapToRejoin: 'Tap to rejoin queue',
     terminalState: 'Your booking is no longer active',
+    ...props.dict?.positionCard,
   };
 
   const formattedTime = new Date(activePos.slotStart).toLocaleTimeString([], {
@@ -51,6 +73,12 @@ export function PositionCard(props: PositionCardProps) {
     activePos.status === 'CHECKED_IN' ||
     activePos.status === 'NO_SHOW' ||
     activePos.status === 'CANCELLED';
+
+  // Deep-link that reopens this ticket on another device. The confirm page
+  // already carries booking/token/phone in its query string, so the current
+  // URL is exactly the shareable status link.
+  const statusUrl =
+    typeof window !== 'undefined' ? window.location.href : '';
 
   return (
     <div className="mx-auto max-w-md rounded-2xl bg-white p-6 shadow-xl border border-teal-100">
@@ -112,6 +140,14 @@ export function PositionCard(props: PositionCardProps) {
         >
           {t.tapToRejoin}
         </button>
+      )}
+
+      {!isTerminal && statusUrl && (
+        <TicketQr
+          ticketNumber={activePos.ticketNumber}
+          statusUrl={statusUrl}
+          lang={props.lang ?? 'en'}
+        />
       )}
     </div>
   );

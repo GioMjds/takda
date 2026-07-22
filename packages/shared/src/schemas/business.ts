@@ -4,7 +4,10 @@ export const businessSlugSchema = z
   .string()
   .min(2, 'Slug must be at least 2 characters')
   .max(50, 'Slug must be at most 50 characters')
-  .regex(/^[a-z0-9-]+$/u, 'Slug must contain only lowercase letters, numbers, and hyphens');
+  .regex(
+    /^[a-z0-9-]+$/u,
+    'Slug must contain only lowercase letters, numbers, and hyphens',
+  );
 
 export const businessSchema = z.object({
   id: z.string(),

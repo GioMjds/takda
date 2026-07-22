@@ -180,7 +180,8 @@ model Service {
 // -----------------------------------------------------------------------------
 
 /// A customer's reservation of one slot for a service at a time.
-/// Status flows: pending → confirmed → (checked_in | no_show | cancelled).
+/// Status flows: pending → confirmed → serving → completed, with
+/// (serving | confirmed) → no_show and (pending | confirmed) → cancelled.
 /// Bookings are never deleted — terminal states are the audit trail.
 model Booking {
   id             String        @id @default(cuid())
@@ -190,6 +191,11 @@ model Booking {
   /// slotStart is the canonical key for queue ordering.
   /// Always UTC; web formats to business TZ.
   slotStart      DateTime
+  /// Human-readable, daily-resetting, monotonic-per-business queue number.
+  /// Assigned atomically at creation via the QueueCounter row. Nullable so
+  /// pre-existing bookings (and any create path that predates numbering)
+  /// remain valid; new bookings always receive one.
+  ticketNumber   Int?
   /// Customer details — captured at booking time, not normalized into a
   /// "Customer" table in v1 (walk-in businesses don't have repeat logins).
   customerName   String
@@ -199,11 +205,24 @@ model Booking {
   /// Where this booking came from. Walk-ins are added by the owner.
   source         BookingSource @default(ONLINE)
   status         BookingStatus @default(PENDING)
+  /// Queue prioritization tier. Higher-priority tiers sort ahead of lower
+  /// ones at the same slotStart. See PriorityTier.
+  priorityTier   PriorityTier  @default(STANDARD)
   /// Idempotency key used at creation time, if any. Indexed for support
   /// lookups ("did the customer's retry actually book?").
   idempotencyKey String?
   /// When the owner marked this booking as checked_in / no_show / etc.
   resolvedAt     DateTime?
+  /// When the booking was called to the counter (status → SERVING).
+  servingAt      DateTime?
+  /// Number of times the owner has re-announced this booking while serving.
+  recallCount    Int           @default(0)
+  /// When the customer was fully served (status → COMPLETED). Terminal.
+  completedAt    DateTime?
+  /// When the booking was cancelled (status → CANCELLED). Terminal.
+  cancelledAt    DateTime?
+  /// Who initiated the cancellation. NULL unless status is CANCELLED.
+  cancelledBy    CancelledBy?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
@@ -219,8 +238,29 @@ model Booking {
   @@unique([serviceId, slotStart, customerPhone], name: "service_slot_phone_unique")
   @@index([businessId, slotStart])
   @@index([businessId, status, slotStart])
+  @@index([businessId, status, completedAt])
   @@index([customerPhone])
   @@index([tenantId])
+}
+
+/// Per-business, per-day monotonic counter backing Booking.ticketNumber.
+/// A single row per (businessId, businessDate) is upserted-and-incremented
+/// inside the booking-creation transaction, so ticket numbers are unique
+/// and gapless within a business day and reset at the business-timezone
+/// day boundary. `businessDate` is the local calendar date (business TZ),
+/// stored as a `date`.
+model QueueCounter {
+  id           String   @id @default(cuid())
+  businessId   String
+  /// Local calendar date in the business's timezone (midnight-anchored).
+  businessDate DateTime @db.Date
+  /// Last issued ticket number for this business/day. Next issue is +1.
+  lastNumber   Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([businessId, businessDate], name: "business_date_unique")
+  @@index([businessId])
 }
 
 // -----------------------------------------------------------------------------
@@ -371,12 +411,34 @@ enum BookingStatus {
   PENDING
   /// Customer's slot is locked in.
   CONFIRMED
-  /// Owner marked the customer as arrived and served (or in progress).
+  /// Owner marked the customer as arrived (legacy manual check-in).
   CHECKED_IN
+  /// Called to the counter and currently being served (head of queue).
+  SERVING
+  /// Customer has been fully served. Terminal.
+  COMPLETED
   /// Customer didn't show up. Terminal.
   NO_SHOW
   /// Customer or owner cancelled before slot. Terminal.
   CANCELLED
+}
+
+/// Queue prioritization tiers, highest priority first. Ordering in the
+/// queue sorts by this tier (rank) before slotStart. Extensible: append
+/// new tiers at the end and update the shared rank helper.
+enum PriorityTier {
+  VIP
+  PREGNANT
+  PWD
+  SENIOR
+  STANDARD
+}
+
+/// Who initiated a booking cancellation, for audit and messaging.
+enum CancelledBy {
+  CUSTOMER
+  OWNER
+  SYSTEM
 }
 
 enum BookingSource {

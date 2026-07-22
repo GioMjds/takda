@@ -12,6 +12,7 @@ import { QueueService } from './queue.service';
 import { WsExceptionFilter } from '../common/filters/ws-exception.filter';
 import { BookingCreatedEvent } from '../bookings/events/booking-created.event';
 import { BookingChangedEvent } from '../bookings/events/booking-changed.event';
+import { QueueHeadChangedEvent } from '../bookings/events/queue-head-changed.event';
 
 @WebSocketGateway({
   namespace: '/queue',
@@ -61,9 +62,7 @@ export class QueueGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  handleDisconnect(_client: Socket) {
-    // Rooms are automatically cleaned up by Socket.IO
-  }
+  handleDisconnect() {}
 
   @OnEvent('booking.created')
   async handleBookingCreated(event: BookingCreatedEvent) {
@@ -99,6 +98,18 @@ export class QueueGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server
       .to(`queue:booking:${event.bookingId}`)
       .emit('queue.position', pos);
+  }
+
+  @OnEvent('queue.head.changed')
+  handleHeadChanged(event: QueueHeadChangedEvent) {
+    this.server
+      .to(`queue:business:${event.businessId}`)
+      .emit('queue.head.changed', {
+        businessId: event.businessId,
+        bookingId: event.bookingId,
+        ticketNumber: event.ticketNumber,
+        status: event.status,
+      });
   }
 
   private scheduleSnapshotBroadcast(businessId: string) {

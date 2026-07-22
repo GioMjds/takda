@@ -14,6 +14,9 @@ describe('QueueService', () => {
         findUnique: jest.fn(),
         findMany: jest.fn(),
       },
+      business: {
+        findUnique: jest.fn().mockResolvedValue({ timezone: 'Asia/Manila' }),
+      },
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -51,8 +54,10 @@ describe('QueueService', () => {
         slotStart: new Date('2026-07-20T09:00:00.000Z'),
         createdAt: new Date('2026-07-20T08:05:00.000Z'),
         status: 'PENDING',
+        ticketNumber: 12,
+        priorityTier: 'STANDARD',
         service: { id: 'srv_1', durationMin: 15 },
-        business: { id: 'biz_1', slug: 'barbershop' },
+        business: { id: 'biz_1', slug: 'barbershop', timezone: 'Asia/Manila' },
       };
 
       const dayBookings = [
@@ -61,12 +66,14 @@ describe('QueueService', () => {
           slotStart: new Date('2026-07-20T08:30:00.000Z'),
           createdAt: new Date('2026-07-20T08:00:00.000Z'),
           status: 'CONFIRMED',
+          priorityTier: 'STANDARD',
         },
         {
           id: 'b_2',
           slotStart: new Date('2026-07-20T09:00:00.000Z'),
           createdAt: new Date('2026-07-20T08:05:00.000Z'),
           status: 'PENDING',
+          priorityTier: 'STANDARD',
         },
       ];
 
@@ -81,6 +88,9 @@ describe('QueueService', () => {
         peopleAhead: 1,
         estimatedWaitMin: 15,
         slotStart: '2026-07-20T09:00:00.000Z',
+        status: 'PENDING',
+        ticketNumber: 12,
+        priorityTier: 'STANDARD',
       });
     });
   });

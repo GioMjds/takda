@@ -4,7 +4,7 @@ import {
   DemoFrame,
   FeaturesSection,
   FooterBar,
-} from '@/pages/[lang]/_index';
+} from '@/views/[lang]/_index';
 
 export default async function HomePage({ params }: PageProps<'/[lang]'>) {
   const { lang } = await params;

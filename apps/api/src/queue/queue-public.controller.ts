@@ -1,20 +1,35 @@
-import { Controller, Post, Param, Body, UsePipes, ConflictException } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Param,
+  Body,
+  UsePipes,
+  ConflictException,
+  Get,
+} from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { Public } from '../common/decorators/public.decorator';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { QueueTokenService } from './queue-token.service';
 import { PrismaService } from '../prisma/prisma.service';
-import { refreshQueueTokenInputSchema, RefreshQueueTokenInput, ERROR_CODES } from '@takda/shared';
+import {
+  refreshQueueTokenInputSchema,
+  RefreshQueueTokenInput,
+  ERROR_CODES,
+  isTerminalStatus,
+} from '@takda/shared';
+import { QueueService } from './queue.service';
 
-@Controller('v1/bookings')
-export class QueueController {
+@Controller({ path: 'bookings', version: '1' })
+export class QueuePublicController {
   constructor(
     private readonly queueTokenService: QueueTokenService,
+    private readonly queueService: QueueService,
     private readonly prisma: PrismaService,
   ) {}
 
   @Public()
-  @Throttle({ default: { limit: 10, ttl: 60000 } })
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
   @Post(':id/queue-token')
   @UsePipes(new ZodValidationPipe(refreshQueueTokenInputSchema))
   async refreshQueueToken(
@@ -32,7 +47,7 @@ export class QueueController {
       });
     }
 
-    if (['CANCELLED', 'NO_SHOW', 'CHECKED_IN'].includes(booking.status)) {
+    if (isTerminalStatus(booking.status)) {
       throw new ConflictException({
         code: ERROR_CODES.BOOKING_TERMINAL,
         message: `Booking is in terminal state '${booking.status}'`,
@@ -55,5 +70,12 @@ export class QueueController {
       queueToken: token,
       queueTokenExpiresAt: expiresAt,
     };
+  }
+
+  @Public()
+  @Throttle({ default: { limit: 30, ttl: 60_000 } })
+  @Get(':id/position')
+  async getQueuePosition(@Param('id') bookingId: string) {
+    return this.queueService.computePositionForBooking(bookingId);
   }
 }

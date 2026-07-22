@@ -61,6 +61,25 @@ export default async function DashboardLayout({
       ),
     },
     {
+      name: dict.dashboard.tabs.history ?? 'History',
+      href: `/${lang}/dashboard/history` as Route,
+      icon: (
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M3 3v5h5M3.05 13A9 9 0 106 5.3L3 8m9 1v4l3 2"
+          />
+        </svg>
+      ),
+    },
+    {
       name: dict.dashboard.tabs.qr,
       href: `/${lang}/dashboard/qr` as Route,
       icon: (

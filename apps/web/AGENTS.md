@@ -73,19 +73,20 @@ without polluting the URL.
 ## 3. Routing & Separation of Concerns
 
 - **Server Components by default.** Add `"use client"` only when the component needs state, effects, browser APIs, or event handlers. Keep data fetching and layouts strictly server-side where possible.
-- **Separation of concerns via `/pages/<route-name>`**: Route files under `app/[lang]/...` (e.g. `page.tsx`, `layout.tsx`, `template.tsx`) must serve only as routing wrappers. The presentation layer, hooks, and API calls must be organized inside `pages/<route-name>/`.
-  - Inside `pages/<route-name>/`, folders are structured as:
+- **Separation of concerns via `/views/<route-name>`**: Route files under `app/[lang]/...` (e.g. `page.tsx`, `layout.tsx`, `template.tsx`) must serve only as routing wrappers. The presentation layer, hooks, and API calls must be organized inside `views/<route-name>/`.
+  - **Why `views/` and not `pages/`**: Next.js reserves a workspace-root `pages/` directory for the legacy Pages Router and turns every non-underscore file inside it into a route — which collides head-on with the App Router in `app/`. This presentation layer is therefore named `views/`. Do not name it `pages/`.
+  - Inside `views/<route-name>/`, folders are structured as:
     - `hooks/`: Page-specific custom hooks (e.g., react-hook-form setups, local state hooks, custom effects).
     - `api/`: API fetch files calling endpoints configured in `configs/fetch.ts`, named after the HTTP method (e.g., `GET.ts`, `POST.ts`, `PUT.ts`, `DELETE.ts`).
     - `sections/`: UI layout sections and sub-components specific to this route.
     - `index.ts`: Barrel file exporting views, hooks, and sections.
   - Mirrored routing mapping (mirroring folders in `app/`):
-    - `app/[lang]/page.tsx` $\rightarrow$ `pages/[lang]/` (Home page)
-    - `app/[lang]/(auth)/login/page.tsx` $\rightarrow$ `pages/[lang]/login/`
-    - `app/[lang]/(customer)/b/[businessSlug]/page.tsx` $\rightarrow$ `pages/[lang]/b/[businessSlug]/`
-    - `app/[lang]/(customer)/b/[businessSlug]/confirm/page.tsx` $\rightarrow$ `pages/[lang]/b/[businessSlug]/confirm/`
-    - `app/[lang]/(onboarding)/onboarding/page.tsx` $\rightarrow$ `pages/[lang]/onboarding/`
-    - `app/[lang]/(owner)/dashboard/page.tsx` $\rightarrow$ `pages/[lang]/dashboard/`
+    - `app/[lang]/page.tsx` $\rightarrow$ `views/[lang]/` (Home page)
+    - `app/[lang]/(auth)/login/page.tsx` $\rightarrow$ `views/[lang]/login/`
+    - `app/[lang]/(customer)/b/[businessSlug]/page.tsx` $\rightarrow$ `views/[lang]/b/[businessSlug]/`
+    - `app/[lang]/(customer)/b/[businessSlug]/confirm/page.tsx` $\rightarrow$ `views/[lang]/b/[businessSlug]/confirm/`
+    - `app/[lang]/(onboarding)/onboarding/page.tsx` $\rightarrow$ `views/[lang]/onboarding/`
+    - `app/[lang]/(owner)/dashboard/page.tsx` $\rightarrow$ `views/[lang]/dashboard/`
 
 - **Typecheck & Typed Routes**: Always run typecheck via `pnpm typecheck` inside the `web` workspace to check typed routes and link path correctness. Do not use the root turbo scripts if you want to run workspace scripting directly.
 
@@ -135,10 +136,10 @@ without polluting the URL.
   - `'use client'`: Mark files containing hooks (`useState`, `useEffect`), event handlers, browser APIs, or animation libraries (e.g., `motion`).
   - `'use server'`: Restrict only to files or functions serving as entry points for Server Actions. Do not mix server actions inside client component files.
   - `'use cache'`: Utilize at database query or expensive calculation boundaries to cache server-rendered properties.
-  - **Server-Side vs. Client-Side Page Components**: To ensure maximum SEO indexability and fast page loads, the main route page (`page.tsx`) and the top-level route barrel file (`pages/<route-name>/index.ts`) must remain **Server Components** by default.
+  - **Server-Side vs. Client-Side Page Components**: To ensure maximum SEO indexability and fast page loads, the main route page (`page.tsx`) and the top-level route barrel file (`views/<route-name>/index.ts`) must remain **Server Components** by default.
   - **Integrating Animations & Transitions**: If a page requires transitions, page entrance animations, or hover micro-interactions via `motion`:
     - Do not mark the entire page as a Client Component.
-    - Encapsulate the animated portions inside specific child components within `pages/<route-name>/sections/` and mark _only_ those sub-components with `'use client'`.
+    - Encapsulate the animated portions inside specific child components within `views/<route-name>/sections/` and mark _only_ those sub-components with `'use client'`.
     - Import these animated sub-components back into the parent Server Component. This retains the semantic SEO structure on the initial server render while cleanly applying client-side animations after hydration.
 
 - Public routes are under `(customer)/b/[businessSlug]/...`; everything under `(owner)/...` requires a session. The `(owner)` layout enforces auth — don't duplicate the check in each page.
@@ -217,7 +218,8 @@ without polluting the URL.
   - Use `@variant dark (&:where(.dark, .dark *));` or standard media query variants for dark mode. **Do NOT use deprecated `@custom-variant` directives**, as they produce build-time compiler warnings in `@tailwindcss/postcss`.
 
 - **Preventing Un-Updated Styles & Build Warnings**:
-  - **No Dynamic String Interpolation for Class Names**: Tailwind v4 uses a static scanner to detect class names at build time. Never construct class names dynamically using template literals or string concatenation (e.g., `` className={`bg-${color}-500`} `` or `` text-${variant} ``). Dynamically generated classes cannot be detected by the scanner, causing styles to fail to compile or update. Always use complete literal strings or exhaustive lookup objects:
+  - **No Dynamic String Interpolation for Class Names**: Tailwind v4 uses a static scanner to detect class names at build time. Never construct class names dynamically using template literals or string concatenation (e.g., ``className={`bg-${color}-500`}`` or `text-${variant}`). Dynamically generated classes cannot be detected by the scanner, causing styles to fail to compile or update. Always use complete literal strings or exhaustive lookup objects:
+
     ```typescript
     // BAD (Tailwind scanner misses these, styles won't update):
     const badgeColor = `bg-${variant}-100 text-${variant}-800`;
@@ -228,11 +230,14 @@ without polluting the URL.
       warning: 'bg-amber-100 text-amber-800',
     };
     ```
+
   - **Avoid Deprecated `@apply` Directives**: Do not use `@apply` for layout classes or inside `@layer base`. Complex `@apply` declarations (especially modifier utility combinations like `@apply outline-ring/50;`) generate PostCSS compiler warnings and silent failures in v4. Use utility classes directly on elements or standard CSS declarations in `globals.css` (e.g. `border-color: var(--border);`).
   - **Scanning Shared Workspaces (`@source`)**: When referencing utility classes or components located in external workspace packages (e.g. `@takda/shared`), explicitly add `@source` directives in `globals.css` so the v4 compiler extracts all utility classes:
+
     ```css
     @source "../../packages/shared";
     ```
+
   - **PostCSS Setup**: `postcss.config.mjs` must use `@tailwindcss/postcss` exclusively (do not mix legacy `tailwindcss` PostCSS plugin configs).
 
 - **Design Tokens & Theme Variables**:

@@ -3,9 +3,7 @@ import type { Locale } from '@/lib/i18n';
 
 export default async function QRPage({
   params,
-}: {
-  params: Promise<{ lang: string }>;
-}) {
+}: PageProps<'/[lang]/dashboard/qr'>) {
   const { lang } = await params;
   const dict = await getDictionary(lang as Locale);
 

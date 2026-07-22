@@ -41,6 +41,7 @@
     "tabs": {
       "queue": "Queue",
       "slots": "Slots",
+      "history": "History",
       "qr": "QR Code",
       "analytics": "Analytics",
       "settings": "Settings"
