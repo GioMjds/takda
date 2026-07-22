@@ -19,6 +19,7 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { EmailModule } from './email/email.module';
 import { BranchesModule } from './branches/branches.module';
 import { EmployeesModule } from './employees/employees.module';
+import { InvitesModule } from './invites/invites.module';
 
 @Module({
   imports: [
@@ -67,6 +68,7 @@ import { EmployeesModule } from './employees/employees.module';
     EmailModule,
     BranchesModule,
     EmployeesModule,
+    InvitesModule,
   ],
   providers: [
     {
