@@ -8,3 +8,4 @@ export * from './branch';
 export * from './employee';
 export * from './invite';
 export * from './business-settings';
+export * from './working-hours';

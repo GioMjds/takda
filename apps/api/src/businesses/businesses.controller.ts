@@ -37,7 +37,8 @@ export class BusinessesController {
   @UsePipes(new ZodValidationPipe(createBusinessInputSchema))
   async create(
     @CurrentUser() user: CurrentUserPayload,
-    @Body(new ZodValidationPipe(createBusinessInputSchema)) dto: CreateBusinessInput,
+    @Body(new ZodValidationPipe(createBusinessInputSchema))
+    dto: CreateBusinessInput,
   ) {
     return this.businessesService.create(user.tenantId, user.userId, dto);
   }
