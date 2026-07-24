@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { businessSettingsSchema } from './business-settings';
 
 export const businessSlugSchema = z
   .string()
@@ -17,6 +18,7 @@ export const businessSchema = z.object({
   timezone: z.string().default('Asia/Manila'),
   address: z.string().nullable().optional(),
   phone: z.string().nullable().optional(),
+  settings: businessSettingsSchema.default({}),
   isActive: z.boolean(),
   createdAt: z.date(),
   updatedAt: z.date(),
@@ -28,6 +30,7 @@ export const createBusinessInputSchema = z.object({
   timezone: z.string().default('Asia/Manila'),
   address: z.string().nullable().optional(),
   phone: z.string().nullable().optional(),
+  settings: businessSettingsSchema.optional(),
 });
 
 export const updateBusinessInputSchema = createBusinessInputSchema.partial();

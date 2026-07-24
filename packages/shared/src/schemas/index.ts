@@ -7,3 +7,4 @@ export * from './auth';
 export * from './branch';
 export * from './employee';
 export * from './invite';
+export * from './business-settings';
