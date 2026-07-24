@@ -18,7 +18,7 @@ export const businessSchema = z.object({
   timezone: z.string().default('Asia/Manila'),
   address: z.string().nullable().optional(),
   phone: z.string().nullable().optional(),
-  settings: businessSettingsSchema.default({}),
+  settings: businessSettingsSchema.default(() => businessSettingsSchema.parse({})),
   isActive: z.boolean(),
   createdAt: z.date(),
   updatedAt: z.date(),

@@ -96,6 +96,7 @@ model Business {
   // Address & contact
   address   String?
   phone     String?
+  settings  Json     @default("{}")
   // Status
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
@@ -431,6 +432,7 @@ enum UserRole {
   OWNER
   ADMIN
   STAFF
+  MANAGER
 }
 
 enum MembershipRole {

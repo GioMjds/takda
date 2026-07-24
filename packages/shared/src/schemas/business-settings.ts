@@ -12,8 +12,8 @@ export const businessSettingsSchema = z
   })
   .strict();
 
-export const updateBusinessSettingsSchema = businessSettingsSchema.partial().strict();
+export const updateBusinessSettingsInputSchema = businessSettingsSchema.partial().strict();
 
 export type BusinessSettings = z.infer<typeof businessSettingsSchema>;
 
-export type UpdateBusinessSettingsInput = z.infer<typeof updateBusinessSettingsSchema>;
+export type UpdateBusinessSettingsInput = z.infer<typeof updateBusinessSettingsInputSchema>;

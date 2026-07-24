@@ -8,6 +8,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateBusinessInput,
   UpdateBusinessInput,
+  UpdateBusinessSettingsInput,
   ListBusinessesQuery,
   ERROR_CODES,
 } from '@takda/shared';
@@ -206,5 +207,52 @@ export class BusinessesService {
       where: { id: business.id },
       data: { isActive: false },
     });
+  }
+
+  async updateSettings(
+    idOrSlug: string,
+    userId: string,
+    dto: UpdateBusinessSettingsInput
+  ) {
+    return this.prisma.$transaction(async (tx) => {
+      const business = await tx.business.findFirst({
+        where: {
+          OR: [{ id: idOrSlug }, { slug: idOrSlug }],
+          isActive: true,
+        },
+        include: {
+          memberships: {
+            where: { userId },
+          },
+        },
+      });
+
+      if (!business) {
+        throw new NotFoundException({
+          code: ERROR_CODES.BUSINESS_NOT_FOUND,
+          message: `Business ${idOrSlug} not found.`,
+        });
+      }
+
+      const membership = business.memberships[0];
+
+      if (
+        !membership ||
+        (membership.role !== 'OWNER' && membership.role !== 'MANAGER')
+      ) {
+        throw new ForbiddenException({
+          code: ERROR_CODES.FORBIDDEN,
+          message: 'You do not have access to manage this business.',
+        });
+      }
+
+      const existingSettings = (business.settings as Record<string, any>) || {};
+      const mergedSettings = { ...existingSettings, ...dto };
+
+      return tx.business.update({
+        where: { id: business.id },
+        data: { settings: mergedSettings },
+      });
+    })
   }
 }
