@@ -102,9 +102,7 @@ export function isWithinBusinessHours(
   const currentDayOfWeek = dayMap[map.weekday];
   const rule = workingHours.find((h) => h.dayOfWeek === currentDayOfWeek);
 
-  if (!rule || rule.isClosed) {
-    return false;
-  }
+  if (!rule || rule.isClosed) return false;
 
   const currentHHmm = `${map.hour.padStart(2, '0')}:${map.minute.padStart(2, '0')}`;
   return currentHHmm >= rule.openTime && currentHHmm < rule.closeTime;
