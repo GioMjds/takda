@@ -44,6 +44,7 @@ model User {
   tenant        Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   memberships   Membership[]
   refreshTokens RefreshToken[]
+  staffInvites  StaffInvite[]  @relation("InvitedBy")
 
   @@unique([tenantId, email])
   @@index([tenantId])
@@ -95,18 +96,22 @@ model Business {
   // Address & contact
   address   String?
   phone     String?
+  settings  Json     @default("{}")
   // Status
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  tenant      Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  services    Service[]
-  bookings    Booking[]
-  memberships Membership[]
-  reminders   Reminder[]
-  messages    Message[]
-  overrides   DayOverride[]
+  tenant       Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  services     Service[]
+  bookings     Booking[]
+  memberships  Membership[]
+  reminders    Reminder[]
+  messages     Message[]
+  overrides    DayOverride[]
+  branched     Branch[]
+  staffInvites StaffInvite[]
+  workingHours WorkingHours[]
 
   @@unique([tenantId, slug])
   @@index([tenantId])
@@ -142,9 +147,6 @@ model DayOverride {
 // -----------------------------------------------------------------------------
 
 /// A bookable offering of a business (e.g. "Haircut", "Stall #3 pickup").
-/// Capacity is *derived* from this config + DayOverride — slots are not
-/// stored as a long list; they're materialized on demand and cached in Redis
-/// (per AGENTS.md §8).
 model Service {
   id              String   @id @default(cuid())
   businessId      String
@@ -164,6 +166,8 @@ model Service {
   /// Days of the week the service is offered. Bitmask: Sun=1, Mon=2, ... Sat=64.
   /// (Kept as Int for portability; helper in shared package interprets it.)
   daysOfWeekMask  Int      @default(127)
+  branchId        String?
+  branch          Branch?  @relation(fields: [branchId], references: [id], onDelete: SetNull)
   isActive        Boolean  @default(true)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -223,6 +227,8 @@ model Booking {
   cancelledAt    DateTime?
   /// Who initiated the cancellation. NULL unless status is CANCELLED.
   cancelledBy    CancelledBy?
+  branchId       String?
+  branch         Branch?       @relation(fields: [branchId], references: [id], onDelete: SetNull)
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
@@ -244,11 +250,6 @@ model Booking {
 }
 
 /// Per-business, per-day monotonic counter backing Booking.ticketNumber.
-/// A single row per (businessId, businessDate) is upserted-and-incremented
-/// inside the booking-creation transaction, so ticket numbers are unique
-/// and gapless within a business day and reset at the business-timezone
-/// day boundary. `businessDate` is the local calendar date (business TZ),
-/// stored as a `date`.
 model QueueCounter {
   id           String   @id @default(cuid())
   businessId   String
@@ -267,9 +268,7 @@ model QueueCounter {
 // Notifications
 // -----------------------------------------------------------------------------
 
-/// A scheduled reminder tied to a booking. The BullMQ queue is the runtime
-/// schedule; this table is the durable record so we can audit, re-queue on
-/// worker restart, and de-duplicate retries by `kind` per AGENTS.md §11.
+/// A scheduled reminder tied to a booking.
 model Reminder {
   id          String         @id @default(cuid())
   bookingId   String
@@ -300,8 +299,7 @@ model Reminder {
   @@index([status, scheduledAt])
 }
 
-/// Audit log of every SMS the system sends. Per AGENTS.md §10: we never
-/// send without a stable templateId and a `vars` snapshot for replay.
+/// Audit log of every SMS the system sends.
 model Message {
   id                String        @id @default(cuid())
   tenantId          String
@@ -337,8 +335,8 @@ model Message {
 // Idempotency
 // -----------------------------------------------------------------------------
 
-/// Persisted response for every `Idempotency-Key` we honor, per
-/// AGENTS.md §7. A retry with the same key returns the same body — we
+/// Persisted response for every `Idempotency-Key`.
+/// A retry with the same key returns the same body — we
 /// never paper over with a synthetic 200.
 model IdempotencyKey {
   id             String   @id @default(cuid())
@@ -366,8 +364,7 @@ model IdempotencyKey {
 // -----------------------------------------------------------------------------
 
 /// Append-only audit log of meaningful business events ("booking created",
-/// "booking cancelled", "walk-in added"). Per AGENTS.md §13 every entry
-/// carries the requestId for correlation.
+/// "booking cancelled", "walk-in added").
 model AuditLog {
   id          String   @id @default(cuid())
   tenantId    String
@@ -390,6 +387,59 @@ model AuditLog {
   @@index([subjectType, subjectId])
 }
 
+/// A physical location of a business. Bookings and services can scope to a branch.
+model Branch {
+  id         String   @id @default(cuid())
+  businessId String
+  name       String
+  address    String?
+  phone      String?
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  business Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  bookings Booking[]
+  services Service[]
+
+  @@unique([businessId, name])
+  @@index([businessId])
+}
+
+/// A pending invitation for a new staff user to join a business. The
+model StaffInvite {
+  id          String         @id @default(cuid())
+  businessId  String
+  email       String
+  role        MembershipRole
+  tokenHash   String         @unique
+  invitedById String
+  expiresAt   DateTime
+  acceptedAt  DateTime?
+  revokedAt   DateTime?
+  createdAt   DateTime       @default(now())
+
+  business  Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  invitedBy User     @relation("InvitedBy", fields: [invitedById], references: [id])
+
+  @@index([businessId, email])
+  @@index([expiresAt])
+}
+
+/// A business's working hours, for display in the storefront and for slot generation.
+model WorkingHours {
+  id         String  @id @default(cuid())
+  businessId String
+  dayOfWeek  Int
+  openTime   String
+  closeTime  String
+  isClosed   Boolean @default(false)
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([businessId, dayOfWeek])
+}
+
 // -----------------------------------------------------------------------------
 // Enums
 // -----------------------------------------------------------------------------
@@ -398,6 +448,7 @@ enum UserRole {
   OWNER
   ADMIN
   STAFF
+  MANAGER
 }
 
 enum MembershipRole {

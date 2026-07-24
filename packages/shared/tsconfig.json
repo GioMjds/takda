@@ -6,9 +6,10 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "sourceMap": true,
-    "declaration": true
+    "declaration": true,
+    "types": ["jest"]
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "src/**/__tests__/*"]
+  "exclude": ["node_modules", "dist", "src/**/__tests__/*"],
 }
 

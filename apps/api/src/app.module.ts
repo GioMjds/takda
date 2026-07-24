@@ -17,6 +17,10 @@ import { BookingsModule } from './bookings/bookings.module';
 import { BusinessesModule } from './businesses/businesses.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { EmailModule } from './email/email.module';
+import { BranchesModule } from './branches/branches.module';
+import { EmployeesModule } from './employees/employees.module';
+import { InvitesModule } from './invites/invites.module';
+import { WorkingHoursModule } from './working-hours/working-hours.module';
 
 @Module({
   imports: [
@@ -63,6 +67,10 @@ import { EmailModule } from './email/email.module';
     BusinessesModule,
     NotificationsModule,
     EmailModule,
+    BranchesModule,
+    EmployeesModule,
+    InvitesModule,
+    WorkingHoursModule,
   ],
   providers: [
     {
