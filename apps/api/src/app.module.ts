@@ -20,6 +20,7 @@ import { EmailModule } from './email/email.module';
 import { BranchesModule } from './branches/branches.module';
 import { EmployeesModule } from './employees/employees.module';
 import { InvitesModule } from './invites/invites.module';
+import { WorkingHoursModule } from './working-hours/working-hours.module';
 
 @Module({
   imports: [
@@ -69,6 +70,7 @@ import { InvitesModule } from './invites/invites.module';
     BranchesModule,
     EmployeesModule,
     InvitesModule,
+    WorkingHoursModule,
   ],
   providers: [
     {

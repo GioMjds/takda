@@ -102,7 +102,7 @@ model Business {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  tenant       Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenant       Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   services     Service[]
   bookings     Booking[]
   memberships  Membership[]
@@ -111,6 +111,7 @@ model Business {
   overrides    DayOverride[]
   branched     Branch[]
   staffInvites StaffInvite[]
+  workingHours WorkingHours[]
 
   @@unique([tenantId, slug])
   @@index([tenantId])
@@ -405,6 +406,7 @@ model Branch {
   @@index([businessId])
 }
 
+/// A pending invitation for a new staff user to join a business. The
 model StaffInvite {
   id          String         @id @default(cuid())
   businessId  String
@@ -422,6 +424,20 @@ model StaffInvite {
 
   @@index([businessId, email])
   @@index([expiresAt])
+}
+
+/// A business's working hours, for display in the storefront and for slot generation.
+model WorkingHours {
+  id         String  @id @default(cuid())
+  businessId String
+  dayOfWeek  Int
+  openTime   String
+  closeTime  String
+  isClosed   Boolean @default(false)
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([businessId, dayOfWeek])
 }
 
 // -----------------------------------------------------------------------------
