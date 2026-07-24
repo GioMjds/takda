@@ -17,6 +17,7 @@ import {
   CreateBusinessInput,
   UpdateBusinessInput,
   ListBusinessesQuery,
+  UpdateBusinessSettingsInput,
 } from '@takda/shared';
 import { Roles } from '../common/decorators/roles.decorator';
 import {
@@ -74,5 +75,16 @@ export class BusinessesController {
     @Param('idOrSlug') idOrSlug: string,
   ) {
     return this.businessesService.softDelete(idOrSlug, userId);
+  }
+
+  @Patch(':idOrSlug/settings')
+  @Roles(UserRole.ADMIN, UserRole.OWNER, UserRole.MANAGER)
+  @UsePipes(new ZodValidationPipe(updateBusinessInputSchema))
+  async updateSettings(
+    @CurrentUser('userId') userId: string,
+    @Param('isOrSlug') idOrSlug: string,
+    @Body() dto: UpdateBusinessSettingsInput,
+  ) {
+    return this.businessesService.updateSettings(idOrSlug, userId, dto);
   }
 }
