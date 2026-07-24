@@ -64,3 +64,48 @@ export function timeZoneOffsetMs(instant: Date, timeZone: string): number {
 
   return asUtc - instant.getTime();
 }
+
+export interface WorkingHourRule {
+  dayOfWeek: number;
+  openTime: string;
+  closeTime: string;
+  isClosed: boolean;
+}
+
+export function isWithinBusinessHours(
+  workingHours: WorkingHourRule[],
+  instant: Date,
+  timeZone: string,
+): boolean {
+  const dtf = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    weekday: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
+
+  const parts = dtf.formatToParts(instant);
+  const map: Record<string, string> = {};
+  for (const p of parts) map[p.type] = p.value;
+
+  const dayMap: Record<string, number> = {
+    Sun: 0,
+    Mon: 1,
+    Tue: 2,
+    Wed: 3,
+    Thu: 4,
+    Fri: 5,
+    Sat: 6,
+  };
+
+  const currentDayOfWeek = dayMap[map.weekday];
+  const rule = workingHours.find((h) => h.dayOfWeek === currentDayOfWeek);
+
+  if (!rule || rule.isClosed) {
+    return false;
+  }
+
+  const currentHHmm = `${map.hour.padStart(2, '0')}:${map.minute.padStart(2, '0')}`;
+  return currentHHmm >= rule.openTime && currentHHmm < rule.closeTime;
+}
